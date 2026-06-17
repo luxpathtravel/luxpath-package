@@ -1,0 +1,2757 @@
+﻿#package_user_code_name_for_later_import_reference_p_id,
+#package_clint_code_number_p_id {
+    font-size: 2vw;
+    width: 50%;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
+#package_user_code_name_for_later_import_reference_p_id {
+    text-align: left;
+    float: left;
+    padding-left: 3px;
+}
+
+#package_clint_code_number_p_id {
+    text-align: right;
+    float: right;
+    padding-right: 3px;
+}
+
+
+
+
+
+
+#clint_full_name_p {
+    width: 100%;
+    font-size: 2vw;
+    padding: 3px 0;
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Inserted clint data position */
+.clint_data_row_class {
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    border-bottom: 0.5px solid black;
+}
+
+.clint_data_row_class div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 0.5px solid black;
+}
+
+.clint_data_row_class div * {
+    text-align: center;
+}
+
+.clint_data_row_class div:first-child {
+    flex-grow: 0.9;
+}
+
+.clint_data_row_class p {
+    font-size: 2.5vw;
+}
+
+/* Reduce the width of "من" and "الى" cells */
+.clint_data_row_class div:nth-child(2),
+.clint_data_row_class div:nth-child(3) {
+    flex-grow: 0.5;
+}
+
+/* Reduce the width of "مجموع الليالي" cells */
+.clint_data_row_class div:nth-child(4) {
+    flex-grow: 0.4;
+    border-left: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Inserted package including data position */
+.inserted_package_including_and_not_icluding_data_div_class {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.inserted_package_including_and_not_icluding_data_div_class p {
+    width: 100%;
+    font-size: 2vw;
+    margin: 0 0 0.5vmax 0;
+    padding: 0 0.5vmax 0 0;
+    text-align: start;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.special_package_including_data_background_color_text {
+    background: rgb(85, 127, 137);
+    color: white;
+}
+
+
+
+
+
+/* Styling For Vide Styling */
+.no_right_padding_for_vid_design_h6_class {
+    padding-right: 0 !important;
+}
+
+.no_right_padding_for_vid_design_h6_class h6 {
+    background: rgb(230, 184, 183) !important;
+    border-top-right-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    color: black !important;
+}
+
+.no_right_padding_for_vid_design_img_class {
+    padding-bottom: 0 !important;
+}
+
+.no_right_padding_for_vid_design_p_class {
+    background: rgb(230, 184, 183) !important;
+    border-top-right-radius: 3px !important;
+    border-bottom-right-radius: 3px !important;
+    color: white !important;
+    width: fit-content !important;
+    padding-right: 5px !important;
+    color: black !important;
+}
+
+.no_right_padding_for_vid_design_div_class {
+    background: rgb(99, 37, 35) !important;
+}
+
+
+
+
+
+/* Pdf section title */
+.pdf_section_title_div_class {
+    background: white;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: auto;
+    padding: 10px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.pdf_section_title_div_class h6 {
+    background: rgb(161, 45, 10);
+    width: fit-content;
+    color: white;
+    font-size: 2.5vw;
+    padding: 5px 15px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 3px;
+    direction: rtl;
+}
+
+.pdf_section_title_div_class ion-icon {
+    font-size: 4.5vw;
+}
+
+.pdf_section_title_div_class p {
+    font-size: 4.5vw;
+    margin-right: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== HOTEL DRAG & DROP ===== */
+.hotel_row_class.drag-placeholder {
+    opacity: 0.25;
+    background: #bbdefb !important;
+}
+
+.hotel_row_image_controller {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.hotel_row_image_controller:active {
+    cursor: grabbing;
+}
+
+body.is-dragging,
+body.is-dragging * {
+    cursor: grabbing !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Inserted hotel data position */
+.hotel_row_class,
+.all_hotel_row_data_divs_container {
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    border-bottom: 0.5px solid black;
+}
+
+.hotel_row_class div,
+.all_hotel_row_data_divs_container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 0.5px solid black;
+}
+
+.hotel_row_class div * {
+    text-align: center;
+}
+
+.hotel_row_class div:first-child {
+    flex-grow: 0.9;
+}
+
+.hotel_row_class div:last-child {
+    flex-grow: 0.65;
+}
+
+.hotel_row_class div:last-child img {
+    width: 100%;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.hotel_row_class h1,
+.hotel_row_class h2,
+.hotel_row_class h3,
+.hotel_row_class h4,
+.hotel_row_class h5,
+.hotel_row_class h6,
+.hotel_row_class p {
+    font-size: 2.2vw;
+    font-weight: 600;
+}
+
+.hotel_row_class span {
+    font-size: 1.5vw;
+    font-weight: 600;
+}
+
+/* Reduce the width of "تاريخ الدخول وتاريخ الخروج" and cells */
+.hotel_row_class div:nth-child(2),
+.hotel_row_class div:nth-child(3) {
+    flex-grow: 0.6;
+}
+
+/* Reduce the width of "عدد الليالي" and "المدينة" cells */
+.hotel_row_class div:nth-child(4) {
+    flex-grow: 0.5;
+}
+
+/* Reduce the width of "نوع الغرفة" and "المدينة" cells */
+.hotel_row_class div:nth-child(5) {
+    flex-grow: 1.2;
+}
+
+/* Reduce the width of "عدد الوحدات" cell */
+.hotel_row_class div:nth-child(6) {
+    flex-grow: 0.55;
+}
+
+/* Reduce the width of "المدينة والصورة" cells */
+.hotel_row_class div:nth-child(7) {
+    flex-grow: 0.65;
+    font-size: 0.5vw;
+    border-left: none;
+}
+
+.hotel_row_class_for_editing div * {
+    padding: 0 2px;
+}
+
+/* Reduce the width of "المدينة والصورة" cells */
+.hotel_row_class div:nth-child(1) * {
+    padding: 0 1.5px;
+}
+
+/* Reduce the width of "المدينة والصورة" cells */
+.hotel_row_class div:nth-child(7) * {
+    padding: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Inserted package important note position */
+#company_by_value_p_id {
+    width: fit-content;
+    font-size: 2vw;
+    margin: 5px 0;
+    justify-self: left;
+    text-align: center;
+    padding: 1px 3px !important;
+    margin-left: 5px !important;
+    border-radius: 3px;
+}
+
+.inserted_package_including_data_text {
+    margin: 2px 0;
+}
+
+/* Inline icons beside activity text */
+.activity_icon_img {
+    height: 14vw;
+    width: auto;
+    margin: 0 1px;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+
+.activity_icon_container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+}
+
+
+
+
+
+
+/* Inserted package total price section */
+#package_total_price_div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#package_total_price_div h6 {
+    background: rgb(182, 54, 15);
+    color: white;
+    font-size: 5vw;
+    padding: 5px 15px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+#package_total_price_div p {
+    font-size: 5vw;
+    padding: 5px 15px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Inserted flight data position */
+.flight_row_class {
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    border-bottom: 0.5px solid black;
+}
+
+.flight_row_class div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 0.5px solid black;
+}
+
+.flight_row_class div * {
+    text-align: center;
+}
+
+.flight_row_class div:first-child {
+    flex-grow: 0.9;
+}
+
+.flight_row_class h1,
+.flight_row_class h2,
+.flight_row_class h3,
+.flight_row_class p {
+    font-size: 2.3vw;
+    font-weight: 600;
+}
+
+/* Reduce the width of "من" and "الى" cells */
+.flight_row_class div:nth-child(4),
+.flight_row_class div:nth-child(5) {
+    flex-grow: 0.9;
+}
+
+/* Reduce the width of "عدد الأشخاص" cell */
+.flight_row_class div:nth-child(2) {
+    flex-grow: 1;
+}
+
+/* Reduce the width of "عدد الأشخاص" cell */
+.flight_row_class div:nth-child(6) {
+    flex-grow: 0.8;
+}
+
+/* Reduce the width of "وقت الإقلاع" and "وقت الوصول" cells */
+.flight_row_class div:nth-child(7),
+.flight_row_class div:nth-child(8) {
+    flex-grow: 0.75;
+}
+
+/* Reduce the width of "وقت الوصول" cell */
+.flight_row_class div:nth-child(8) {
+    border-left: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Inserted transportation_plan data position */
+.clint_movements_row_class {
+    background: white;
+    min-height: 9vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    border-bottom: 0.5px solid black;
+}
+
+.clint_movements_row_class div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 0.5px solid black;
+    transition: all 0.1s ease-in-out;
+}
+
+.clint_movements_row_class div * {
+    text-align: center;
+}
+
+.clint_movements_row_class h1,
+.clint_movements_row_class h2,
+.clint_movements_row_class h3,
+.clint_movements_row_class h4,
+.clint_movements_row_class p {
+    font-size: 2vw;
+    font-weight: 600;
+}
+
+/* Reduce the width of "من" cell */
+.clint_movements_row_class div:nth-child(1) {
+    flex-grow: 0.2;
+}
+
+/* Reduce the width of "الى" cell */
+.clint_movements_row_class div:nth-child(3) {
+    flex-grow: 0.3;
+    border-left: none;
+}
+
+
+.clint_movements_all_p_elements_div_class {
+    display: flex;
+    flex-direction: column;
+}
+
+.clint_movements_all_p_elements_div_class p {
+    margin: 0;
+    padding: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.Important_notes_for_each_pdf_section_div_class {
+    padding: 5px 5px 0 5px;
+    display: none;
+}
+
+.Important_notes_for_each_pdf_section_div_class h5,
+.Important_notes_for_each_pdf_section_div_class h6 {
+    font-size: 1.5vw;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Delete box message */
+.ensure_your_delete_action {
+    z-index: 1000;
+    background-color: white;
+    width: 95%;
+    max-width: 520px;
+    padding: 24px 20px 18px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.15);
+    transform: translate(-50%, -130vh);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ensure_your_delete_action button {
+    color: white;
+    font-size: clamp(13px, 2.5vw, 17px);
+    margin: 4px;
+    padding: 9px 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    background: #1C3D2E;
+    font-weight: 600;
+    font-family: inherit;
+    direction: rtl;
+    min-height: 42px;
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.ensure_your_delete_action button:hover {
+    opacity: 0.88;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+}
+
+.ensure_your_delete_action button:active {
+    transform: translateY(0px) scale(0.97);
+    box-shadow: none;
+    opacity: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Name pdf file box */
+#name_pdf_file_div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    top: 50%;
+    left: 50%;
+    box-shadow: 0 0 5px black;
+    border: 1px solid black;
+    transform: translate(-50%, -130vh);
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 95%;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.5s ease;
+}
+
+#name_pdf_file_div p {
+    background: rgb(85, 127, 137);
+    width: fit-content;
+    color: white;
+    font-size: 2vw;
+    margin-bottom: 20px;
+    padding: 1px 5px;
+    text-align: center;
+    border: 0.5px solid black;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* inserted main row data coloring */
+.inserted_main_row_color_class {
+    background: rgb(207, 83, 21);
+    color: white;
+    border-top: 0.5px solid black;
+}
+
+#vid_clint_deposit_note_p_id {
+    font-size: 1.4vw;
+    width: 100%;
+    text-align: start;
+    font-weight: bold;
+    padding: 0 10px 2px;
+    background: rgb(0, 108, 133);
+    color: white;
+}
+
+#hotel_links_guide_note_p_id {
+    font-size: clamp(9px, 1.4vw, 13px);
+    width: 100%;
+    text-align: right;
+    direction: rtl;
+    padding: 4px 10px 4px 6px;
+    margin: 6px 0 0 0;
+    background: rgba(28, 61, 46, 0.06);
+    color: #1C3D2E;
+    border-right: 3px solid #C9A84C;
+    border-radius: 0 4px 4px 0;
+}
+
+
+
+
+/* Media Queries */
+/* 950px */
+@media(max-width:950px) {
+    .inserted_company_name_logo {
+        width: 25vw;
+    }
+
+
+
+
+
+
+
+
+    #package_user_code_name_for_later_import_reference_p_id {
+        font-size: 2.5vw;
+    }
+
+    #package_clint_code_number_p_id {
+        font-size: 2.5vw;
+    }
+
+
+
+
+    #clint_full_name_p {
+        font-size: 2.5vw;
+    }
+
+
+
+
+
+
+
+
+
+
+    .pdf_section_title_div_class {
+        padding: 6px;
+    }
+
+    .pdf_section_title_div_class h6 {
+        font-size: 2.7vw;
+        padding: 3px 10px;
+    }
+
+    .pdf_section_title_div_class ion-icon {
+        font-size: 5.5vw;
+    }
+
+    .pdf_section_title_div_class p {
+        font-size: 5.5vw;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .inserted_package_including_and_not_icluding_data_div_class p {
+        font-size: 2.5vw;
+    }
+
+    .activity_icon_img {
+        height: 16vw;
+    }
+
+    .activity_icon_container {
+        gap: 3px;
+        margin-top: 2px;
+    }
+
+
+
+
+
+
+
+
+
+    .Important_notes_for_each_pdf_section_div_class h5,
+    .Important_notes_for_each_pdf_section_div_class h6 {
+        font-size: 2vw;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    .ensure_your_delete_action button {
+        font-size: 4vw;
+        padding: 4px;
+    }
+
+    #name_pdf_file_div p {
+        font-size: 3vw;
+    }
+}
+
+/* 650px */
+@media(max-width:650px) {
+
+    #package_user_code_name_for_later_import_reference_p_id {
+        font-size: 3vw;
+    }
+
+    #package_clint_code_number_p_id {
+        font-size: 3vw;
+    }
+
+    .ensure_your_delete_action {
+        padding: 10px;
+    }
+
+    .ensure_your_delete_action button {
+        font-size: 5vw;
+        padding: 3px;
+    }
+}
+
+
+/* 580px */
+@media(max-width:580px) {
+    .inserted_company_name_logo {
+        width: 30vw;
+        margin-bottom: 5px;
+    }
+
+
+
+
+
+
+
+
+
+    #clint_full_name_p {
+        font-size: 3.5vw;
+    }
+
+
+
+
+
+
+
+    .clint_data_row_class p {
+        font-size: 3.5vw;
+    }
+
+
+
+
+
+
+
+    .pdf_section_title_div_class {
+        padding: 4px;
+    }
+
+    .pdf_section_title_div_class h6 {
+        font-size: 3.5vw;
+        padding: 2px 5px;
+    }
+
+    .pdf_section_title_div_class ion-icon {
+        font-size: 6.5vw;
+    }
+
+    .pdf_section_title_div_class p {
+        font-size: 6.5vw;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    .hotel_row_class h1,
+    .hotel_row_class h2,
+    .hotel_row_class h3,
+    .hotel_row_class h4,
+    .hotel_row_class h5,
+    .hotel_row_class h6,
+    .hotel_row_class p {
+        font-size: 2.6vw;
+    }
+
+    .hotel_row_class span {
+        font-size: 2vw;
+    }
+
+    .hotel_row_class h1 {
+        font-size: 2.45vw;
+    }
+
+    .smaller_main_hotel_row_text_size_class p {
+        font-size: 2.4vw;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .flight_row_class h1,
+    .flight_row_class h2,
+    .flight_row_class h3,
+    .flight_row_class p {
+        font-size: 2.5vw;
+    }
+
+    .smaller_main_flight_row_text_size_class p {
+        font-size: 2.4vw;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    .clint_movements_row_class h1,
+    .clint_movements_row_class h2,
+    .clint_movements_row_class h3,
+    .clint_movements_row_class h4,
+    .clint_movements_row_class p {
+        font-size: 2.5vw;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .Important_notes_for_each_pdf_section_div_class h5,
+    .Important_notes_for_each_pdf_section_div_class h6 {
+        font-size: 2.4vw;
+    }
+
+
+
+
+    #company_by_value_p_id {
+        font-size: 2.5vw;
+        padding: 2px 0;
+    }
+
+
+
+
+
+
+
+
+
+
+    #vid_clint_deposit_note_p_id {
+        font-size: 2.1vw;
+    }
+
+
+
+
+}
+
+/* 400px */
+@media(max-width:400px) {
+    .inserted_company_name_logo {
+        width: 35vw;
+        margin-bottom: 0px;
+    }
+
+
+
+
+
+
+    #package_user_code_name_for_later_import_reference_p_id {
+        font-size: 3.5vw;
+    }
+
+    #package_clint_code_number_p_id {
+        font-size: 3.5vw;
+    }
+
+
+
+    #clint_full_name_p {
+        font-size: 4.5vw;
+    }
+
+
+
+
+
+
+
+
+    .inserted_package_including_and_not_icluding_data_div_class p {
+        font-size: 3.2vw;
+        padding: 3px 3px 3px 0;
+    }
+
+    .activity_icon_img {
+        height: 17vw;
+    }
+
+    .activity_icon_container {
+        gap: 2px;
+        margin-top: 2px;
+    }
+
+
+
+
+
+
+    .hotel_row_class span {
+        font-size: 2.4vw;
+    }
+
+    .hotel_special_room_request_p_class {
+        font-size: 1.7vw !important;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .Important_notes_for_each_pdf_section_div_class h5,
+    .Important_notes_for_each_pdf_section_div_class h6 {
+        font-size: 2.6vw;
+    }
+
+
+
+
+    #company_by_value_p_id {
+        font-size: 2.7vw;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    #package_total_price_div h6 {
+        font-size: 7vw;
+        padding: 3px 10px;
+    }
+
+    #package_total_price_div p {
+        font-size: 7vw;
+        padding: 3px 10px;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    .ensure_your_delete_action {
+        padding: 5px;
+    }
+
+    .ensure_your_delete_action button {
+        font-size: 7vw;
+        padding: 2px;
+    }
+
+
+
+
+
+    /* Name pdf file box */
+    #name_pdf_file_div {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #name_pdf_file_div p {
+        font-size: 4.5vw;
+    }
+
+
+
+
+
+    #vid_clint_deposit_note_p_id {
+        font-size: 2.2vw;
+    }
+}
+
+/* ══════════════════════════════════════════════════════
+   FIRST PDF PAGE — NEW ARCH DESIGN
+   All styles scoped to #downloaded_pdf_clint_data_page
+   ══════════════════════════════════════════════════════ */
+
+#downloaded_pdf_clint_data_page {
+    background: #FAF7F0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* ─── Arch wrapper ─── */
+#pdf_page1_arch_wrapper {
+    padding-top: 14px;
+    background: #FAF7F0;
+}
+
+/* Outer gold border — rounded arch */
+#pdf_page1_arch_outer_border {
+    border: 3px solid #C9A84C;
+    border-bottom: none;
+    padding: 5px 5px 0;
+    border-top-left-radius: 52% 42%;
+    border-top-right-radius: 52% 42%;
+    background: #FAF7F0;
+    overflow: hidden;
+}
+
+/* Inner gold border — clips image to arch shape */
+#pdf_page1_arch_inner_frame {
+    position: relative;
+    border: 2px solid #C9A84C;
+    border-bottom: none;
+    border-top-left-radius: 50% 40%;
+    border-top-right-radius: 50% 40%;
+    overflow: hidden;
+    height: 56vw;
+    line-height: 0;
+    background: #1C3D2E;
+}
+
+/* Hero image fills the arch */
+#downloaded_pdf_clint_data_page #welcome_pdf_first_page_image_id {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    padding: 0 !important;
+}
+
+/* ─── Welcome text ─── */
+#pdf_page1_welcome_area {
+    text-align: center;
+    background: #FAF7F0;
+    padding: 10px 15px 4px;
+    line-height: 1.15;
+}
+
+#pdf_page1_welcome_subtitle_p {
+    font-size: clamp(10px, 1.8vw, 17px) !important;
+    color: #666 !important;
+    margin: 0 0 2px 0 !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+    display: block !important;
+}
+
+#pdf_page1_welcome_title_p {
+    font-size: clamp(24px, 6vw, 52px) !important;
+    font-weight: 900 !important;
+    color: #1C3D2E !important;
+    margin: 0 !important;
+    padding-top: 12px !important;
+    text-align: center !important;
+    display: block !important;
+    letter-spacing: 0.04em;
+    direction: rtl !important;
+    unicode-bidi: bidi-override !important;
+}
+
+/* ─── Package type badge(s) ─── */
+#downloaded_pdf_clint_data_page #pdf_clint_info_section_title_div_id {
+    justify-content: center !important;
+    background: #FAF7F0 !important;
+    padding: 8px 15px 4px !important;
+    gap: 8px;
+    flex-wrap: wrap !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+#downloaded_pdf_clint_data_page #clint_package_type_h6 {
+    background: #1C3D2E !important;
+    color: white !important;
+    border-radius: 30px !important;
+    border-top-left-radius: 30px !important;
+    border-bottom-left-radius: 30px !important;
+    padding: 7px 26px !important;
+    font-size: clamp(12px, 2.2vw, 21px) !important;
+    font-weight: 700 !important;
+    border: 2px solid #C9A84C !important;
+    letter-spacing: 0.02em;
+    direction: rtl !important;
+}
+
+#downloaded_pdf_clint_data_page #package_price_type_h6_id {
+    background: #FAF7F0 !important;
+    color: #1C3D2E !important;
+    border-radius: 30px !important;
+    border-top-right-radius: 30px !important;
+    border-bottom-right-radius: 30px !important;
+    padding: 7px 26px !important;
+    font-size: clamp(12px, 2.2vw, 21px) !important;
+    font-weight: 700 !important;
+    border: 2px solid #1C3D2E !important;
+}
+
+/* ─── Client name ─── */
+#downloaded_pdf_clint_data_page #clint_full_name_p {
+    text-align: center !important;
+    font-size: clamp(13px, 2.6vw, 24px) !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    background: #FAF7F0 !important;
+    padding: 2px 10px 8px !important;
+    display: block !important;
+}
+
+/* ─── Data table: white cells with dark green borders ─── */
+#downloaded_pdf_clint_data_page #clint_data_row_main_div_id {
+    background: white !important;
+    color: #1C3D2E !important;
+    margin: 0 14px !important;
+    border: 2px solid #1C3D2E !important;
+    border-bottom: 1px solid rgba(28, 61, 46, 0.3) !important;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+#downloaded_pdf_clint_data_page #clint_data_row_main_div_id div {
+    border-left: 1px solid rgba(28, 61, 46, 0.25) !important;
+    padding: 6px 4px 4px !important;
+}
+
+#downloaded_pdf_clint_data_page #clint_data_row_main_div_id div:last-child {
+    border-left: none !important;
+}
+
+#downloaded_pdf_clint_data_page #clint_data_row_main_div_id p {
+    color: #1C3D2E !important;
+    font-size: clamp(10px, 1.7vw, 17px) !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+}
+
+/* Icon spans */
+.pdf_col_icon_span {
+    font-size: clamp(13px, 2.4vw, 24px);
+    display: block;
+    text-align: center;
+    margin-bottom: 3px;
+    line-height: 1;
+}
+
+/* Dynamic data row */
+#downloaded_pdf_clint_data_page #inserted_clint_data_position_div {
+    margin: 0 14px 14px !important;
+    border: 2px solid #1C3D2E !important;
+    border-top: none !important;
+    border-radius: 0 0 10px 10px !important;
+    overflow: hidden;
+}
+
+#downloaded_pdf_clint_data_page .clint_data_row_class_for_editing {
+    background: white !important;
+    border-bottom: none !important;
+}
+
+#downloaded_pdf_clint_data_page .clint_data_row_class_for_editing div {
+    border-left: 1px solid rgba(28, 61, 46, 0.2) !important;
+    padding: 6px 4px !important;
+}
+
+#downloaded_pdf_clint_data_page .clint_data_row_class_for_editing div:last-child {
+    border-left: none !important;
+}
+
+#downloaded_pdf_clint_data_page .clint_data_row_class_for_editing p {
+    color: #1C3D2E !important;
+    font-size: clamp(12px, 2.2vw, 21px) !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+/* ─── Package code pill (with plane icon) ─── */
+#downloaded_pdf_clint_data_page #package_clint_code_number_p_id[data-has-value="true"] {
+    display: block !important;
+}
+
+#downloaded_pdf_clint_data_page #package_clint_code_number_p_id:not([data-has-value="true"]) {
+    display: none !important;
+}
+
+/* Code pills container — side-by-side row */
+#downloaded_pdf_clint_data_page #pdf_code_pills_row_div {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    padding: 8px 14px 14px !important;
+    direction: ltr !important;
+}
+
+/* Left-align when code number pill is hidden */
+#downloaded_pdf_clint_data_page #pdf_code_pills_row_div:has(#package_clint_code_number_p_id:not([data-has-value="true"])) {
+    justify-content: flex-start !important;
+}
+
+#downloaded_pdf_clint_data_page #package_clint_code_number_p_id {
+    float: none !important;
+    width: fit-content !important;
+    margin: 0 !important;
+    background: #1C3D2E !important;
+    color: white !important;
+    border-radius: 30px !important;
+    padding: 6px 26px !important;
+    font-size: clamp(10px, 1.8vw, 17px) !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    direction: ltr;
+}
+
+#downloaded_pdf_clint_data_page #package_clint_code_number_p_id::before {
+    content: '\2708  ';
+    font-style: normal;
+}
+
+/* User reference code — secondary outlined pill */
+#downloaded_pdf_clint_data_page #package_user_code_name_for_later_import_reference_p_id {
+    display: block !important;
+    float: none !important;
+    width: fit-content !important;
+    margin: 0 !important;
+    background: transparent !important;
+    color: #1C3D2E !important;
+    border: 2px solid #1C3D2E !important;
+    border-radius: 30px !important;
+    padding: 4px 20px !important;
+    font-size: clamp(9px, 1.5vw, 15px) !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    direction: ltr !important;
+}
+
+/* ─── Bali tourist attractions skyline ─── */
+#pdf_page1_skyline_div {
+    width: 100%;
+    margin-top: 4px;
+    line-height: 0;
+    overflow: hidden;
+}
+
+#pdf_page1_skyline_div svg {
+    width: 100%;
+    display: block;
+}
+
+/* Keep middle-page divider image hidden in new first-page design */
+#downloaded_pdf_clint_data_page img.inserted_package_data_section_page_image_class:not(#welcome_pdf_first_page_image_id) {
+    display: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   PDF FLIGHT DATA PAGE — NEW DESIGN
+═══════════════════════════════════════════════════════ */
+
+#downloaded_pdf_flight_data_page {
+    background: #FAF7F0 !important;
+    padding: 0 !important;
+}
+
+/* ─── Header ─── */
+#pdf_flight_page_header_div {
+    padding: 16px 16px 8px;
+    direction: rtl;
+}
+
+#pdf_flight_page_title_row_div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+#pdf_flight_page_plane_icon_span {
+    color: #C9A84C;
+    font-size: clamp(18px, 4vw, 38px);
+    line-height: 1;
+}
+
+#pdf_flight_page_main_title_h1 {
+    font-size: clamp(20px, 4.8vw, 42px);
+    font-weight: 800;
+    color: #1C3D2E;
+    margin: 0;
+}
+
+#pdf_flight_page_subtitle_row_div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pdf_flight_subtitle_line_span {
+    flex: 1;
+    height: 1.5px;
+    background: #C9A84C;
+    display: inline-block;
+}
+
+.pdf_flight_subtitle_arrow_span {
+    color: #C9A84C;
+    font-size: clamp(8px, 1.2vw, 14px);
+    line-height: 1;
+}
+
+#pdf_flight_page_subtitle_p {
+    color: #1C3D2E;
+    font-size: clamp(10px, 1.8vw, 17px);
+    font-weight: 600;
+
+    margin: 0;
+    padding: 0 6px;
+}
+
+/* ─── Content row: table (left) + image (right) ─── */
+#pdf_flight_content_row_div {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+    padding: 0 0 12px;
+    align-items: stretch;
+}
+
+#pdf_flight_table_col_div {
+    flex: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    direction: rtl;
+}
+
+/* Table header row */
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class.inserted_main_row_color_class {
+    background: #1C3D2E !important;
+    border-bottom: none !important;
+}
+
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class.inserted_main_row_color_class p {
+    color: white !important;
+    font-size: clamp(9px, 1.5vw, 15px) !important;
+    font-weight: 700 !important;
+    padding: 7px 2px !important;
+    margin: 0 !important;
+}
+
+/* Data rows */
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class_for_editing {
+    background: white !important;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.35) !important;
+}
+
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class_for_editing:last-child {
+    border-bottom: none !important;
+}
+
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class_for_editing p,
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class_for_editing h1,
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class_for_editing h2,
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class_for_editing h3 {
+    color: #1C3D2E !important;
+    font-size: clamp(10px, 1.7vw, 17px) !important;
+    font-weight: 600 !important;
+    padding: 6px 2px !important;
+    margin: 0 !important;
+}
+
+/* Cell dividers in all rows */
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class div {
+    border-left: 1px solid rgba(201, 168, 76, 0.4) !important;
+    border-bottom: none !important;
+}
+
+#downloaded_pdf_flight_data_page #pdf_flight_table_col_div .flight_row_class div:last-child {
+    border-left: none !important;
+}
+
+/* Image column */
+#pdf_flight_image_col_div {
+    width: 28%;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    line-height: 0;
+    border: 2px solid #C9A84C;
+}
+
+#pdf_flight_hero_img_id {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    padding: 0 !important;
+    border-radius: 6px;
+}
+
+/* ─── Bottom notes row ─── */
+#pdf_flight_notes_row_div {
+    display: flex;
+    flex-direction: row;
+    direction: rtl;
+    gap: 10px;
+    padding: 0 14px 16px;
+}
+
+.pdf_flight_note_card_class {
+    flex: 1;
+    background: white;
+    border: 1.5px solid rgba(201, 168, 76, 0.55);
+    border-radius: 8px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    direction: rtl;
+    text-align: center;
+}
+
+.pdf_flight_note_icon_wrapper_div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(34px, 7.5vw, 60px);
+    height: clamp(34px, 7.5vw, 60px);
+    border-radius: 50%;
+    background: rgba(201, 168, 76, 0.12);
+    border: 1.5px solid rgba(201, 168, 76, 0.5);
+}
+
+.pdf_flight_note_icon_wrapper_div ion-icon {
+    font-size: clamp(14px, 3.2vw, 28px) !important;
+    color: #C9A84C !important;
+}
+
+.pdf_flight_note_text_p {
+    font-size: clamp(8px, 1.3vw, 14px) !important;
+    color: #444 !important;
+    text-align: center !important;
+    margin: 0 !important;
+    line-height: 1.65 !important;
+    direction: rtl !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   PDF HOTEL DATA PAGE — NEW DESIGN
+═══════════════════════════════════════════════════════ */
+
+#downloaded_pdf_hotel_data_page {
+    background: #FAF7F0 !important;
+    padding: 0 !important;
+}
+
+/* ─── Header ─── */
+#pdf_hotel_page_header_div {
+    padding: 16px 16px 8px;
+    direction: rtl;
+}
+
+#pdf_hotel_page_title_row_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: rtl;
+}
+
+#pdf_hotel_page_title_text_div {
+    flex: 1;
+}
+
+#pdf_hotel_page_main_title_h1 {
+    font-size: clamp(20px, 4.8vw, 42px);
+    font-weight: 800;
+    color: #1C3D2E;
+    margin: 0 0 6px 0;
+}
+
+#pdf_hotel_page_icon_badge_div {
+    flex-shrink: 0;
+    width: clamp(40px, 8vw, 65px);
+    height: clamp(40px, 8vw, 65px);
+    border: 2px solid #C9A84C;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 14px;
+}
+
+#pdf_hotel_page_icon_span {
+    font-size: clamp(18px, 4vw, 38px);
+    line-height: 1;
+}
+
+#pdf_hotel_page_subtitle_row_div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: rtl;
+}
+
+.pdf_hotel_subtitle_line_span {
+    flex: 1;
+    height: 1.5px;
+    background: #C9A84C;
+    display: inline-block;
+}
+
+.pdf_hotel_subtitle_arrow_span {
+    color: #C9A84C;
+    font-size: clamp(8px, 1.2vw, 14px);
+    line-height: 1;
+}
+
+#pdf_hotel_page_subtitle_p {
+    color: #1C3D2E;
+    font-size: clamp(10px, 1.8vw, 17px);
+    font-weight: 600;
+
+    margin: 0;
+    padding: 0 6px;
+}
+
+/* ─── Table wrapper ─── */
+#pdf_hotel_table_wrapper_div {
+    margin: 0 0 10px;
+    border: 2px solid #C9A84C;
+    border-radius: 8px;
+    overflow: hidden;
+    direction: rtl;
+}
+
+/* Header row */
+#downloaded_pdf_hotel_data_page .hotel_row_class.inserted_main_row_color_class {
+    background: #1C3D2E !important;
+    border-bottom: none !important;
+    border-top: none !important;
+}
+
+#downloaded_pdf_hotel_data_page .hotel_row_class.inserted_main_row_color_class p {
+    color: white !important;
+    font-size: clamp(9px, 1.5vw, 15px) !important;
+    font-weight: 700 !important;
+    padding: 8px 2px !important;
+    margin: 0 !important;
+}
+
+/* Data rows */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing {
+    background: white !important;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.35) !important;
+}
+
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing:last-child {
+    border-bottom: none !important;
+}
+
+/* Hotel name */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing h1 {
+    color: #1C3D2E !important;
+    font-size: clamp(10px, 1.8vw, 17px) !important;
+    font-weight: 700 !important;
+    padding: 6px 3px !important;
+    margin: 0 !important;
+}
+
+/* Check-in date */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing h2 {
+    color: #444 !important;
+    font-size: clamp(10px, 1.6vw, 17px) !important;
+    font-weight: 600 !important;
+    padding: 6px 3px !important;
+    margin: 0 !important;
+}
+
+/* Check-out date — gold highlight */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing h3 {
+    color: #C9A84C !important;
+    font-size: clamp(10px, 1.6vw, 17px) !important;
+    font-weight: 700 !important;
+    padding: 6px 3px !important;
+    margin: 0 !important;
+}
+
+/* Number of nights */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing h4 {
+    color: #1C3D2E !important;
+    font-size: clamp(11px, 2vw, 19px) !important;
+    font-weight: 800 !important;
+    padding: 6px 3px !important;
+    margin: 0 !important;
+}
+
+/* Room description */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing .description_cell span {
+    color: #333 !important;
+    font-size: clamp(9px, 1.5vw, 15px) !important;
+    padding: 2px 4px !important;
+    display: block !important;
+}
+
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing .description_cell .hotel_special_request_span_class {
+    color: white !important;
+}
+
+/* Unit count */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing p {
+    font-size: clamp(10px, 1.7vw, 17px) !important;
+    color: #1C3D2E !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+/* Cell dividers */
+#downloaded_pdf_hotel_data_page .hotel_row_class div {
+    border-left: 1px solid rgba(201, 168, 76, 0.4) !important;
+    border-bottom: none !important;
+}
+
+#downloaded_pdf_hotel_data_page .hotel_row_class div:last-child {
+    border-left: none !important;
+}
+
+/* Location column — city name */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing h5 {
+    color: #1C3D2E !important;
+    font-size: clamp(10px, 1.6vw, 17px) !important;
+    font-weight: 700 !important;
+    margin: 2px 0 !important;
+    padding: 0 !important;
+}
+
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing h6 {
+    color: #666 !important;
+    font-size: clamp(8px, 1.3vw, 14px) !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Hotel image — square with small radius, fills column width */
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing img {
+    border-radius: 8px !important;
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    height: auto !important;
+}
+
+/* ─── Bottom notes row ─── */
+#pdf_hotel_notes_row_div {
+    display: flex;
+    flex-direction: row;
+    direction: rtl;
+    gap: 10px;
+    padding: 8px 14px 14px;
+}
+
+.pdf_hotel_note_card_class {
+    flex: 1;
+    min-width: clamp(70px, 18vw, 130px);
+    aspect-ratio: 1;
+    background: white;
+    border: 1.5px solid rgba(201, 168, 76, 0.55);
+    border-radius: 8px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    direction: rtl;
+    text-align: center;
+}
+
+.pdf_hotel_note_icon_wrapper_div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(34px, 7.5vw, 60px);
+    height: clamp(34px, 7.5vw, 60px);
+    border-radius: 50%;
+    background: rgba(201, 168, 76, 0.12);
+    border: 1.5px solid rgba(201, 168, 76, 0.5);
+}
+
+.pdf_hotel_note_icon_wrapper_div ion-icon {
+    font-size: clamp(14px, 3.2vw, 28px) !important;
+    color: #C9A84C !important;
+}
+
+.pdf_hotel_note_text_p {
+    font-size: clamp(8px, 1.3vw, 14px) !important;
+    color: #444 !important;
+    text-align: center !important;
+    margin: 0 !important;
+    line-height: 1.65 !important;
+    direction: rtl !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   PDF PACKAGE INCLUDING DATA PAGE — NEW DESIGN
+═══════════════════════════════════════════════════════ */
+
+#downloaded_pdf_package_including_data_page {
+    background: #FAF7F0 !important;
+    padding: 0 !important;
+    direction: rtl;
+}
+
+/* ─── Page header ─── */
+#pdf_including_page_header_div {
+    text-align: center;
+    padding: 18px 16px 10px;
+}
+
+#pdf_including_page_package_type_p {
+    font-size: clamp(22px, 5.5vw, 46px) !important;
+    font-weight: 900 !important;
+    color: #1C3D2E !important;
+    margin: 0 0 6px !important;
+    display: block !important;
+    text-align: center !important;
+}
+
+
+/* ─── Section titles — override pdf_section_title_div_class for this page ─── */
+#downloaded_pdf_package_including_data_page .pdf_section_title_div_class {
+    justify-content: center !important;
+    background: transparent !important;
+    padding: 8px 16px 6px !important;
+    margin: 4px 0 !important;
+}
+
+#downloaded_pdf_package_including_data_page .pdf_section_title_div_class h6 {
+    background: #1C3D2E !important;
+    color: white !important;
+    font-size: clamp(11px, 2vw, 19px) !important;
+    padding: 6px 28px !important;
+    border-radius: 30px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em;
+}
+
+#downloaded_pdf_package_including_data_page .pdf_section_title_div_class p {
+    font-size: clamp(12px, 2.2vw, 21px) !important;
+    margin-right: 8px !important;
+    margin-left: 0 !important;
+}
+
+/* ─── INCLUDING items — grid of icon cards ─── */
+#downloaded_pdf_package_including_data_page #inserted_package_including_data_div {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 6px 14px 12px !important;
+    background: transparent !important;
+}
+
+#downloaded_pdf_package_including_data_page #inserted_package_including_data_div p {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: right !important;
+    background: white !important;
+    border: 1.5px solid rgba(201, 168, 76, 0.45) !important;
+    border-radius: 12px !important;
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: clamp(11px, 2vw, 17px) !important;
+    font-weight: 600 !important;
+    color: #1C3D2E !important;
+    gap: 12px !important;
+    direction: rtl !important;
+    box-sizing: border-box !important;
+}
+
+/* Specific ion-icon per item type */
+#downloaded_pdf_package_including_data_page #inserted_package_including_data_div p ion-icon {
+    font-size: clamp(16px, 3.5vw, 28px) !important;
+    color: #1C3D2E !important;
+    background: rgba(201, 168, 76, 0.15) !important;
+    border-radius: 50% !important;
+    padding: clamp(5px, 1vw, 8px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: clamp(30px, 6vw, 48px) !important;
+    height: clamp(30px, 6vw, 48px) !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Special teal highlight items (keep teal bg, white text) */
+#downloaded_pdf_package_including_data_page #inserted_package_including_data_div p.special_package_including_data_background_color_text {
+    background: rgb(85, 127, 137) !important;
+    color: white !important;
+    border-color: rgb(85, 127, 137) !important;
+}
+
+#downloaded_pdf_package_including_data_page #inserted_package_including_data_div p.special_package_including_data_background_color_text ion-icon {
+    color: white !important;
+    background: rgba(255,255,255,0.2) !important;
+}
+
+/* ─── GIFT items — horizontal flex cards ─── */
+#downloaded_pdf_package_including_data_page #inserted_package_icluding_gift_data_div {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 6px 14px 12px !important;
+    background: transparent !important;
+}
+
+#downloaded_pdf_package_including_data_page #inserted_package_icluding_gift_data_div p {
+    flex: 1 1 calc(33% - 10px) !important;
+    min-width: 28% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+    background: white !important;
+    border: 1.5px solid rgba(201, 168, 76, 0.45) !important;
+    border-radius: 12px !important;
+    padding: 12px 10px !important;
+    margin: 0 !important;
+    width: auto !important;
+    font-size: clamp(10px, 1.6vw, 17px) !important;
+    font-weight: 600 !important;
+    color: #1C3D2E !important;
+    gap: 6px;
+}
+
+#downloaded_pdf_package_including_data_page #inserted_package_icluding_gift_data_div p ion-icon {
+    font-size: clamp(16px, 3.5vw, 32px) !important;
+    color: #C9A84C !important;
+}
+
+#downloaded_pdf_package_including_data_page .activity_icon_img {
+    height: 11vw !important;
+    border-radius: 8px !important;
+}
+
+#downloaded_pdf_package_including_data_page .activity_icon_container {
+    justify-content: center !important;
+    gap: 6px !important;
+}
+
+/* ─── NOT INCLUDING items — styled list ─── */
+#downloaded_pdf_package_including_data_page #inserted_package_not_including_data_div {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 6px 14px 14px !important;
+    background: transparent !important;
+}
+
+#downloaded_pdf_package_including_data_page #inserted_package_not_including_data_div p {
+    background: rgba(220, 53, 69, 0.07) !important;
+    border: 1px solid rgba(220, 53, 69, 0.25) !important;
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    width: auto !important;
+    font-size: clamp(10px, 1.8vw, 17px) !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+#downloaded_pdf_package_including_data_page #inserted_package_not_including_data_div p ion-icon {
+    font-size: clamp(11px, 2vw, 19px) !important;
+    color: #dc3545 !important;
+    vertical-align: middle !important;
+    margin-left: 4px !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PDF MOVEMENTS DATA PAGE — NEW DESIGN
+═══════════════════════════════════════════════════════ */
+
+#downloaded_pdf_clint_movements_data_page {
+    background: #FAF7F0 !important;
+    padding: 0 !important;
+}
+
+/* ─── Header ─── */
+#pdf_movements_page_header_div {
+    padding: 16px 16px 8px;
+    direction: rtl;
+}
+
+#pdf_movements_page_title_row_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: rtl;
+}
+
+#pdf_movements_page_title_text_div {
+    flex: 1;
+}
+
+#pdf_movements_page_main_title_h1 {
+    font-size: clamp(20px, 4.8vw, 42px) !important;
+    font-weight: 800 !important;
+    color: #1C3D2E !important;
+    margin: 0 0 6px 0 !important;
+}
+
+#pdf_movements_page_icon_badge_div {
+    flex-shrink: 0;
+    width: clamp(40px, 8vw, 65px);
+    height: clamp(40px, 8vw, 65px);
+    border: 2px solid #C9A84C;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 14px;
+}
+
+#pdf_movements_page_icon_span {
+    font-size: clamp(18px, 4vw, 38px);
+    line-height: 1;
+}
+
+#pdf_movements_page_subtitle_row_div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: rtl;
+}
+
+.pdf_movements_subtitle_line_span {
+    flex: 1;
+    height: 1.5px;
+    background: linear-gradient(to left, #C9A84C, transparent);
+}
+
+.pdf_movements_subtitle_arrow_span {
+    color: #C9A84C;
+    font-size: clamp(9px, 1.4vw, 15px);
+}
+
+#pdf_movements_page_subtitle_p {
+    font-size: clamp(9px, 1.4vw, 15px) !important;
+    color: #555 !important;
+    margin: 0 !important;
+
+}
+
+/* ─── Table Wrapper ─── */
+#pdf_movements_table_wrapper_div {
+    margin: 0 0 10px;
+    border: 1.5px solid #C9A84C;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Dark green header row override — use both classes for higher specificity than the white row rule */
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class.inserted_main_row_color_class {
+    background: #1C3D2E !important;
+    border-bottom: none !important;
+    min-height: clamp(32px, 6vw, 50px) !important;
+}
+
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class.inserted_main_row_color_class p {
+    color: white !important;
+    font-size: clamp(10px, 1.8vw, 17px) !important;
+    font-weight: 700 !important;
+}
+
+/* Row styling inside wrapper */
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class {
+    background: white !important;
+    border-bottom: 1px solid rgba(201,168,76,0.3) !important;
+    min-height: clamp(42px, 8vw, 65px) !important;
+}
+
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class div {
+    border-left: 1px solid rgba(201,168,76,0.3) !important;
+    padding: 6px 8px !important;
+}
+
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class div:last-child {
+    border-left: none !important;
+}
+
+/* Date column — gold */
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class h1 {
+    color: #C9A84C !important;
+    font-size: clamp(10px, 1.8vw, 17px) !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+}
+
+/* Activities column — normal dark text, RTL */
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class h2 {
+    color: #333 !important;
+    font-size: clamp(10px, 1.6vw, 17px) !important;
+    font-weight: 500 !important;
+    text-align: right !important;
+    direction: rtl !important;
+    line-height: 1.5 !important;
+}
+
+/* City column — dark green text, no background */
+#downloaded_pdf_clint_movements_data_page .clint_movements_row_class h3 {
+    background: none !important;
+    color: #1C3D2E !important;
+    font-size: clamp(10px, 1.6vw, 17px) !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+}
+
+/* ─── Bottom Note Cards ─── */
+#pdf_movements_notes_row_div {
+    display: flex;
+    gap: 10px;
+    padding: 8px 14px 14px;
+    direction: rtl;
+}
+
+.pdf_movements_note_card_class {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 10px;
+    padding: 12px 10px;
+    direction: rtl;
+    text-align: center;
+}
+
+.pdf_movements_note_icon_wrapper_div {
+    flex-shrink: 0;
+    width: clamp(28px, 5.5vw, 46px);
+    height: clamp(28px, 5.5vw, 46px);
+    background: rgba(201,168,76,0.12);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C9A84C;
+    font-size: clamp(14px, 3vw, 26px);
+}
+
+.pdf_movements_note_text_p {
+    font-size: clamp(8px, 1.2vw, 14px) !important;
+    color: #444 !important;
+    margin: 0 !important;
+    line-height: 1.5 !important;
+    direction: rtl !important;
+    text-align: center !important;
+}
+
+
+
+/* =======================================================
+   PDF IMPORTANT NOTES PAGE - LUXURY DESIGN
+======================================================= */
+
+#downloaded_pdf_important_notes_data_page {
+    background: #FAF7F0 !important;
+    padding: 0 !important;
+}
+
+#pdf_notes_page_header_div {
+    padding: 16px 16px 8px;
+    direction: rtl;
+}
+
+#pdf_notes_page_title_row_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: rtl;
+}
+
+#pdf_notes_page_title_text_div { flex: 1; }
+
+#pdf_notes_page_main_title_h1 {
+    font-size: clamp(20px, 4.8vw, 42px) !important;
+    font-weight: 800 !important;
+    color: #1C3D2E !important;
+    margin: 0 0 6px 0 !important;
+}
+
+#pdf_notes_page_icon_badge_div {
+    flex-shrink: 0;
+    width: clamp(40px, 8vw, 65px);
+    height: clamp(40px, 8vw, 65px);
+    border: 2px solid #C9A84C;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 14px;
+}
+
+#pdf_notes_page_icon_span {
+    font-size: clamp(18px, 4vw, 38px);
+    line-height: 1;
+}
+
+#pdf_notes_page_subtitle_row_div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: rtl;
+}
+
+.pdf_notes_subtitle_line_span {
+    flex: 1;
+    height: 1.5px;
+    background: linear-gradient(to left, #C9A84C, transparent);
+}
+
+.pdf_notes_subtitle_arrow_span {
+    color: #C9A84C;
+    font-size: clamp(9px, 1.4vw, 15px);
+}
+
+#pdf_notes_page_subtitle_p {
+    font-size: clamp(9px, 1.4vw, 15px) !important;
+    color: #555 !important;
+    margin: 0 !important;
+
+}
+
+#downloaded_pdf_important_notes_data_page .Important_notes_for_each_pdf_section_div_class {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    padding: 0 14px 12px !important;
+    direction: rtl !important;
+}
+
+#downloaded_pdf_important_notes_data_page .Important_notes_for_each_pdf_section_div_class h6 {
+    background: white !important;
+    border: 1px solid rgba(201,168,76,0.35) !important;
+    border-right: 3px solid #C9A84C !important;
+    border-radius: 10px !important;
+    padding: 10px 12px 10px 10px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    direction: rtl !important;
+    font-size: clamp(8px, 1.25vw, 14px) !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+    text-align: right !important;
+}
+
+#downloaded_pdf_important_notes_data_page .Important_notes_for_each_pdf_section_div_class h6 ion-icon {
+    flex-shrink: 0 !important;
+    font-size: clamp(12px, 2.2vw, 21px) !important;
+    margin-top: 1px !important;
+}
+
+#downloaded_pdf_important_notes_data_page .Important_notes_for_each_pdf_section_div_class h6:last-child {
+    grid-column: 1 / -1 !important;
+    background: rgba(28,61,46,0.06) !important;
+    border: 1.5px solid rgba(28,61,46,0.22) !important;
+    border-right: 3px solid #1C3D2E !important;
+    justify-content: center !important;
+    font-weight: 700 !important;
+    color: #1C3D2E !important;
+    font-size: clamp(8px, 1.35vw, 14px) !important;
+}
+
+#downloaded_pdf_important_notes_data_page .thank_you_container {
+    padding: 0 14px 10px;
+}
+
+#downloaded_pdf_important_notes_data_page .thank_you_card {
+    background: linear-gradient(160deg, #FAF7F0 0%, white 100%) !important;
+    border: 1.5px solid rgba(201,168,76,0.4) !important;
+    box-shadow: 0 4px 20px rgba(28,61,46,0.1) !important;
+}
+
+#downloaded_pdf_important_notes_data_page .thank_you_card::before,
+#downloaded_pdf_important_notes_data_page .thank_you_card::after {
+    background:
+        radial-gradient(circle, rgba(201,168,76,0.35) 0%, rgba(201,168,76,0.35) 24%, transparent 25%) 50% 50% / 100% 100% no-repeat,
+        radial-gradient(circle, rgba(201,168,76,0.18) 0%, rgba(201,168,76,0.18) 18%, transparent 19%) 50% 50% / 75% 75% no-repeat,
+        radial-gradient(circle, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.1) 14%, transparent 15%) 50% 50% / 55% 55% no-repeat !important;
+}
+
+#downloaded_pdf_important_notes_data_page .thank_you_header_glow {
+    background: linear-gradient(to bottom,
+        rgba(28,61,46,0.65) 0%,
+        rgba(28,61,46,0.2) 50%,
+        rgba(255,255,255,0) 100%) !important;
+}
+
+#downloaded_pdf_important_notes_data_page .thank_you_title {
+    color: #1C3D2E !important;
+}
+
+#downloaded_pdf_important_notes_data_page .thank_you_text {
+    border-color: rgba(201,168,76,0.25) !important;
+    background: rgba(201,168,76,0.04) !important;
+}
+
+#downloaded_pdf_important_notes_data_page #company_by_value_p_id {
+    display: block !important;
+    margin: 8px auto 14px !important;
+    text-align: center !important;
+    font-size: clamp(9px, 1.5vw, 15px) !important;
+    color: #1C3D2E !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(201,168,76,0.4) !important;
+    border-radius: 30px !important;
+    padding: 4px 20px !important;
+    width: fit-content !important;
+    background: white !important;
+}
+
+
+/* =======================================================
+   PDF TOTAL PRICE PAGE - LUXURY DESIGN
+======================================================= */
+
+#downloaded_pdf_total_price_data_page {
+    background: #FAF7F0 !important;
+    padding: 0 !important;
+}
+
+#pdf_price_page_header_div {
+    padding: 16px 16px 8px;
+    direction: rtl;
+}
+
+#pdf_price_page_title_row_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: rtl;
+}
+
+#pdf_price_page_title_text_div { flex: 1; }
+
+#pdf_price_page_main_title_h1 {
+    font-size: clamp(20px, 4.8vw, 42px) !important;
+    font-weight: 800 !important;
+    color: #1C3D2E !important;
+    margin: 0 0 6px 0 !important;
+}
+
+#pdf_price_page_icon_badge_div {
+    flex-shrink: 0;
+    width: clamp(40px, 8vw, 65px);
+    height: clamp(40px, 8vw, 65px);
+    border: 2px solid #C9A84C;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 14px;
+}
+
+#pdf_price_page_icon_span {
+    font-size: clamp(18px, 4vw, 38px);
+    line-height: 1;
+}
+
+#pdf_price_page_subtitle_row_div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: rtl;
+}
+
+.pdf_price_subtitle_line_span {
+    flex: 1;
+    height: 1.5px;
+    background: linear-gradient(to left, #C9A84C, transparent);
+}
+
+.pdf_price_subtitle_arrow_span {
+    color: #C9A84C;
+    font-size: clamp(9px, 1.4vw, 15px);
+}
+
+#pdf_price_page_subtitle_p {
+    font-size: clamp(9px, 1.4vw, 15px) !important;
+    color: #555 !important;
+    margin: 0 !important;
+
+}
+
+#pdf_price_reveal_card_div {
+    margin: 10px 14px;
+    background: white;
+    border: 1.5px solid #C9A84C;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 28px rgba(201,168,76,0.2);
+}
+
+#pdf_price_reveal_top_band_div {
+    background: linear-gradient(135deg, #1C3D2E 0%, #2e5c43 100%);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    direction: rtl;
+}
+
+#pdf_price_band_icon {
+    color: #C9A84C;
+    font-size: clamp(14px, 3.2vw, 28px);
+}
+
+#pdf_price_reveal_top_label_p {
+    font-size: clamp(12px, 2.2vw, 21px) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+#downloaded_pdf_total_price_data_page #package_total_price_div {
+    padding: 20px 24px 16px !important;
+    background: white !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#downloaded_pdf_total_price_data_page #package_total_price_div h6 {
+    background: none !important;
+    color: #C9A84C !important;
+    font-size: clamp(9px, 1.5vw, 15px) !important;
+    font-weight: 600 !important;
+    padding: 0 0 6px !important;
+    border-radius: 0 !important;
+    border-bottom: 1.5px solid rgba(201,168,76,0.3) !important;
+    text-align: center !important;
+}
+
+#downloaded_pdf_total_price_data_page #package_total_price_p_id {
+    font-size: clamp(26px, 7vw, 58px) !important;
+    font-weight: 900 !important;
+    color: #1C3D2E !important;
+    text-align: center !important;
+    direction: rtl !important;
+    line-height: 1.1 !important;
+}
+
+#pdf_price_reveal_disclaimer_p {
+    font-size: clamp(8px, 1.2vw, 14px) !important;
+    color: #666 !important;
+    text-align: center !important;
+    direction: rtl !important;
+    margin: 0 !important;
+    padding: 10px 24px 16px !important;
+    border-top: 1px solid rgba(201,168,76,0.2) !important;
+}
+
+#pdf_price_ornament_row_div {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px 14px;
+    gap: 10px;
+}
+
+.pdf_price_ornament_line_span {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #C9A84C, transparent);
+}
+
+.pdf_price_ornament_star_span {
+    color: #C9A84C;
+    font-size: clamp(12px, 2.2vw, 21px);
+    line-height: 1;
+}
+
+#pdf_price_currency_label_p {
+    font-size: clamp(10px, 1.8vw, 17px) !important;
+    font-weight: 700 !important;
+    color: #C9A84C !important;
+    text-align: center !important;
+    direction: rtl !important;
+    margin: 0 0 4px !important;
+    letter-spacing: 1px;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   PRINT-TO-PDF — vector text via browser native engine
+   ══════════════════════════════════════════════════════ */
+@media print {
+    /* Fallback page rule — named page rules injected by JS override this. */
+    @page {
+        margin: 0;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        box-shadow: none !important;
+    }
+
+    /* Hide every direct body child except the print container */
+    body.pdf-print-active > *:not(#pdf-print-container) {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    body.pdf-print-active #pdf-print-container {
+        display: block !important;
+        visibility: visible !important;
+        width: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Each cloned section = one PDF page.
+       The .pdf-print-page-N class (added by JS) assigns it to a named @page
+       so each page is sized to that section's content height. */
+    body.pdf-print-active #pdf-print-container > section {
+        display: block !important;
+        visibility: visible !important;
+        width: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        break-after: page;
+        page-break-after: always;
+        overflow: hidden;
+    }
+
+    /* No trailing blank page after the last section */
+    body.pdf-print-active #pdf-print-container > section:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+}
