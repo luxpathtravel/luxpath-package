@@ -7268,113 +7268,132 @@ downloadPdfWithCustomName = async function (pdfName) {
         return;
     }
 
-    // Ordered sections for print: movements and notes always go last
+    let scale = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 3.3 : 3.3;
+    let pdf = null;
+    let pdfWidth = 210;
+
+    // Always keep important notes and clint movements as separate pages
     let importantNotesSection = visibleSections.find(s => s.id === 'downloaded_pdf_important_notes_data_page');
-    let clintMovementsSection  = visibleSections.find(s => s.id === 'downloaded_pdf_clint_movements_data_page');
+    let clintMovementsSection = visibleSections.find(s => s.id === 'downloaded_pdf_clint_movements_data_page');
     let regularSections = visibleSections.filter(s =>
         s.id !== 'downloaded_pdf_important_notes_data_page' &&
         s.id !== 'downloaded_pdf_clint_movements_data_page'
     );
 
-    let _sectionsForPrint = [
-        ...regularSections,
-        ...(clintMovementsSection ? [clintMovementsSection] : []),
-        ...(importantNotesSection  ? [importantNotesSection]  : [])
-    ];
+    // (merge helper removed — each section now gets its own PDF page)
 
-    if (_sectionsForPrint.length === 0) return;
-
-    // Measure each section at exactly 210mm width so we can size every PDF
-    // page to its content height via CSS named pages.
-    let _measureHost = document.createElement('div');
-    _measureHost.style.cssText = 'position:fixed;left:-30000px;top:0;width:210mm;overflow:visible;pointer-events:none;';
-    document.body.appendChild(_measureHost);
-
-    let _pageHeightsMm = _sectionsForPrint.map(function (section) {
-        let mc = section.cloneNode(true);
-        mc.style.cssText = 'display:block;width:100%;';
-        _measureHost.appendChild(mc);
-        let hPx = mc.getBoundingClientRect().height;
-        _measureHost.removeChild(mc);
-        return Math.ceil(hPx * 25.4 / 96) + 2; // px → mm, +2 mm safety margin
-    });
-    document.body.removeChild(_measureHost);
-
-    // Inject per-section named @page rules.
-    // @page rules are INVALID inside @media — they must be top-level.
-    // Only the page property assignment goes inside @media print.
-    let _dynPageCSS = '';
-    _pageHeightsMm.forEach(function (hMm, i) {
-        _dynPageCSS += '@page pdf-p-' + i + ' { size: 210mm ' + hMm + 'mm; margin: 0; }\n';
-    });
-    _dynPageCSS += '@media print {\n';
-    _pageHeightsMm.forEach(function (hMm, i) {
-        _dynPageCSS += '  .pdf-print-page-' + i + ' { page: pdf-p-' + i + '; }\n';
-    });
-    _dynPageCSS += '}\n';
-    let _dynStyle = document.createElement('style');
-    _dynStyle.id = 'pdf-dynamic-page-sizes';
-    _dynStyle.textContent = _dynPageCSS;
-    document.head.appendChild(_dynStyle);
-
-    // Build a temporary container holding clones of every PDF section.
-    // @media print CSS hides everything else so the browser renders each
-    // section as a native vector PDF page — no rasterization, no pixelation.
-    let _printContainer = document.createElement('div');
-    _printContainer.id = 'pdf-print-container';
-    _sectionsForPrint.forEach(function (section, i) {
-        let clone = section.cloneNode(true);
-        clone.style.display = 'block';
-        clone.style.visibility = 'visible';
-        clone.classList.add('pdf-print-page-' + i);
-        _printContainer.appendChild(clone);
-    });
-
-    // Wrap hotel image cells in real <a> tags so they remain clickable links
-    // in the printed PDF (browser honours <a href> natively).
-    let _hotelClone = _printContainer.querySelector('#downloaded_pdf_hotel_data_page');
-    if (_hotelClone) {
-        _hotelClone.querySelectorAll('.hotel-row-url-cell').forEach(function (cell) {
+    // Collect hotel row link annotations before html2canvas captures the section
+    const _hotelSection = document.getElementById('downloaded_pdf_hotel_data_page');
+    const _hotelLinkAnnotations = [];
+    if (_hotelSection && isVisible(_hotelSection)) {
+        const _sRect = _hotelSection.getBoundingClientRect();
+        _hotelSection.querySelectorAll('.hotel_row_class_for_editing .hotel-row-url-cell').forEach(function (cell) {
             let url = cell.dataset.url;
             if (!url) url = _resolveHotelRowUrl(cell.dataset.hotelName, cell.dataset.roomTypeEn, cell.dataset.isNewWriting === 'true');
             if (!url) return;
-            let img = cell.querySelector('img');
-            if (!img) return;
-            let a = document.createElement('a');
-            a.href = _prepareUrlForOpen(url.replace(/&amp;/g, '&'));
-            a.target = '_blank';
-            a.style.cssText = 'display:block;width:100%;height:100%;';
-            img.parentNode.insertBefore(a, img);
-            a.appendChild(img);
+            const _cRect = cell.getBoundingClientRect();
+            _hotelLinkAnnotations.push({
+                url: url,
+                relX: _cRect.left - _sRect.left,
+                relY: _cRect.top  - _sRect.top,
+                relW: _cRect.width,
+                relH: _cRect.height,
+                sW:   _sRect.width
+            });
         });
     }
+    const _hotelSectionIdxInRegular = regularSections.findIndex(function (s) { return s.id === 'downloaded_pdf_hotel_data_page'; });
 
-    document.body.appendChild(_printContainer);
+    // Process regular sections — one per PDF page
+    for (let i = 0; i < regularSections.length; i++) {
+        let section = regularSections[i];
 
-    // Chrome uses document.title as the suggested PDF filename.
-    let _origTitle = document.title;
-    document.title = pdfName;
-    document.body.classList.add('pdf-print-active');
+        let canvas = await captureCanvas(section, scale);
+        if (!canvas) { continue; }
 
-    // Cleanup after the print dialog closes.
-    window.addEventListener('afterprint', function _afterPrint() {
-        document.title = _origTitle;
-        document.body.classList.remove('pdf-print-active');
-        if (_printContainer.parentNode) document.body.removeChild(_printContainer);
-        let _ds = document.getElementById('pdf-dynamic-page-sizes');
-        if (_ds) _ds.parentNode.removeChild(_ds);
+        let pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        if (!pdf) {
+            pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+        } else {
+            pdf.addPage([pdfWidth, pdfHeight]);
+        }
+        let imgData = canvas.toDataURL('image/jpeg', 0.9);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
 
-        images.forEach(function (img) { img.style.display = 'none'; });
-        notesDivs.forEach(function (div) { div.style.display = 'none'; });
-        document.getElementById('hotel_links_guide_note_p_id').style.display = 'none';
-        document.getElementById('downloaded_pdf_important_notes_data_page').style.display = 'none';
+        // Add clickable link annotations for hotel row URL cells
+        if (_hotelLinkAnnotations.length > 0 && i === _hotelSectionIdxInRegular) {
+            _hotelLinkAnnotations.forEach(function (ann) {
+                const x = ann.relX * pdfWidth / ann.sW;
+                const y = ann.relY * pdfWidth / ann.sW;
+                const w = ann.relW * pdfWidth / ann.sW;
+                const h = ann.relH * pdfWidth / ann.sW;
+                const _pdfUrl = _prepareUrlForOpen(ann.url.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'"));
+                pdf.link(x, y, w, h, { url: _pdfUrl });
+            });
+        }
+    }
 
-        playSoundEffect('success');
-    }, { once: true });
+    // Add Clint Movements as a separate page (if visible)
+    if (clintMovementsSection) {
+        let movementsCanvas = await captureCanvas(clintMovementsSection, scale);
+        if (movementsCanvas) {
+            movementsCanvas = adjustClintMovementsCanvas(movementsCanvas);
+            let pdfHeight = (movementsCanvas.height * pdfWidth) / movementsCanvas.width;
+            if (!pdf) {
+                pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+            } else {
+                pdf.addPage([pdfWidth, pdfHeight]);
+            }
+            let imgData = movementsCanvas.toDataURL('image/jpeg', 0.9);
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
+        }
+    }
 
-    // Small delay so cloned DOM is fully laid out before the dialog opens.
-    await new Promise(resolve => setTimeout(resolve, 200));
-    window.print();
+    // Add Important Notes as the final separate page (if visible)
+    if (importantNotesSection) {
+        let notesCanvas = await captureCanvas(importantNotesSection, scale);
+        if (notesCanvas) {
+            let pdfHeight = (notesCanvas.height * pdfWidth) / notesCanvas.width;
+            if (!pdf) {
+                pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+            } else {
+                pdf.addPage([pdfWidth, pdfHeight]);
+            }
+            let imgData = notesCanvas.toDataURL('image/jpeg', 0.9);
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
+        }
+    }
+
+    if (pdf) {
+        pdf.save(pdfName);
+    }
+
+    // Hide all images with class name of 'inserted_package_data_section_page_image_class'
+    images.forEach(img => {
+        img.style.display = 'none';
+    });
+
+
+    /* Hide All The Important Notes Divs After Downloading The PDF */
+    // Loop through each and set display to 'none'
+    notesDivs.forEach(div => {
+        div.style.display = 'none';
+    });
+
+    // Hide hotel links guide note after PDF capture
+    document.getElementById('hotel_links_guide_note_p_id').style.display = 'none';
+
+
+    // Hide the the last pdf page (thank you page)
+    document.getElementById('downloaded_pdf_important_notes_data_page').style.display = 'none';
+
+
+
+    // The important notes page is now handled by sectionsToInclude, so no need to explicitly hide it here.
+
+
+    // Play a sound effect
+    playSoundEffect('success');
 
 
 
