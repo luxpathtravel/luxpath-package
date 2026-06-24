@@ -10,16 +10,7 @@
     function _scheduleBuild() {
         clearTimeout(_timer);
         _timer = setTimeout(() => {
-            const hotelRows = document.querySelectorAll(
-                '#inserted_hotel_data_position_div .hotel_row_class_for_editing'
-            );
-            const tableDiv = document.getElementById('package_price_table_div');
-            if (hotelRows.length > 0) {
-                buildPriceTable();
-            } else if (tableDiv) {
-                tableDiv.innerHTML = '';
-                tableDiv.dataset.built = 'false';
-            }
+            buildPriceTable();
         }, 600);
     }
 
@@ -33,17 +24,19 @@
                 attributeFilter: ['data-safe-side-price', 'data-safe-side-price2']
             });
         }
-
-        const clintContainer = document.getElementById('inserted_clint_data_position_div');
-        if (clintContainer) {
-            new MutationObserver(_scheduleBuild).observe(clintContainer, {
-                childList: true,
-                subtree: true,
-                characterData: true
-            });
-        }
+        // Note: client/passenger data no longer auto-rebuilds the table.
+        // SIM + domestic-flight prices refresh only via pptRefreshFromClintData()
+        // (called by createWholePackageAndClintDataFunction).
     });
 })();
+
+// Explicit refresh of SIM + domestic-flight prices, triggered when the client/passenger
+// data is (re)submitted. Forces the domestic-flight input to recompute by clearing the
+// last-flight signature, then rebuilds the table (no hotels required).
+function pptRefreshFromClintData() {
+    window._pptLastFlightSig = null; // force the domestic-flight auto-fill to run
+    buildPriceTable();
+}
 
 // ─── Main builder ────────────────────────────────────
 async function buildPriceTable() {
@@ -59,9 +52,10 @@ async function buildPriceTable() {
     }
 
     let pricesByCity = {};
-    let exchangeRate        = 4700;
-    let simCardPriceBali    = 0;
+    let exchangeRate = 4700;
+    let simCardPriceBali = 0;
     let simCardPriceJakarta = 0;
+    let domesticTicketPrice = 0;
 
     try {
         const [citiesRes, settingsRes] = await Promise.all([
@@ -72,33 +66,33 @@ async function buildPriceTable() {
             citiesRes.data.forEach(p => { pricesByCity[p.city] = p; });
         if (!settingsRes.error && settingsRes.data)
             settingsRes.data.forEach(s => {
-                if (s.key === 'exchange_rate')          exchangeRate        = parseInt(s.value) || 4700;
-                if (s.key === 'sim_card_price_bali')    simCardPriceBali    = parseInt(s.value) || 0;
+                if (s.key === 'exchange_rate') exchangeRate = parseInt(s.value) || 4700;
+                if (s.key === 'sim_card_price_bali') simCardPriceBali = parseInt(s.value) || 0;
                 if (s.key === 'sim_card_price_jakarta') simCardPriceJakarta = parseInt(s.value) || 0;
+                if (s.key === 'domestic_flight_ticket_price') domesticTicketPrice = parseInt(s.value) || 0;
             });
     } catch (e) {
         console.warn('Could not fetch package prices/settings:', e);
     }
 
-    window._pptSettings = { exchangeRate, simCardPriceBali, simCardPriceJakarta };
+    window._pptSettings = { exchangeRate, simCardPriceBali, simCardPriceJakarta, domesticTicketPrice };
 
     const hotelRows = [...document.querySelectorAll(
         '#inserted_hotel_data_position_div .hotel_row_class_for_editing'
     )];
 
-    const adultsRaw   = document.querySelector('#inserted_clint_data_position_div .clint_data_row_class_for_editing div:first-child p')?.innerText || '';
-    const adultsMatch = adultsRaw.match(/\d+/);
-    const adultsCount = adultsMatch ? parseInt(adultsMatch[0]) : 0;
+    const passengersText = document.querySelector('#inserted_clint_data_position_div .clint_data_row_class_for_editing div:first-child p')?.innerText || '';
+    const { adults: adultsCount, children: childrenCount, infants: infantsCount } = _pptParsePassengers(passengersText);
 
     const rows = [];
 
     // 1. Hotel rows (combine safeSidePrice + safeSidePrice2)
     hotelRows.forEach(hotelRow => {
-        const name     = hotelRow.querySelector('h1')?.innerText?.trim() || 'فندق';
+        const name = hotelRow.querySelector('h1')?.innerText?.trim() || 'فندق';
         const nightsTx = hotelRow.querySelector('h4')?.innerText || '';
-        const nights   = parseInt(nightsTx.replace(/[^0-9]/g, '')) || 0;
-        const raw1     = parseInt(hotelRow.dataset.safeSidePrice  || '') || 0;
-        const raw2     = parseInt(hotelRow.dataset.safeSidePrice2 || '') || 0;
+        const nights = parseInt(nightsTx.replace(/[^0-9]/g, '')) || 0;
+        const raw1 = parseInt(hotelRow.dataset.safeSidePrice || '') || 0;
+        const raw2 = parseInt(hotelRow.dataset.safeSidePrice2 || '') || 0;
         const rawPrice = (raw1 + raw2) > 0 ? (raw1 + raw2) : null;
 
         rows.push({ type: 'hotel', label: name, badge: `${nights} ليلة`, price: rawPrice, deletable: false });
@@ -107,17 +101,17 @@ async function buildPriceTable() {
     // 2. Transport rows per city (nights + 1 days)
     const cityNights = {};
     hotelRows.forEach(hotelRow => {
-        const city    = hotelRow.querySelector('h5')?.innerText?.trim() || '';
+        const city = hotelRow.querySelector('h5')?.innerText?.trim() || '';
         const nightTx = hotelRow.querySelector('h4')?.innerText || '';
-        const nights  = parseInt(nightTx.replace(/[^0-9]/g, '')) || 0;
+        const nights = parseInt(nightTx.replace(/[^0-9]/g, '')) || 0;
         if (city && nights > 0) cityNights[city] = (cityNights[city] || 0) + nights;
     });
 
     Object.entries(cityNights).forEach(([city, nights]) => {
-        const pd     = pricesByCity[city];
+        const pd = pricesByCity[city];
         const perDay = pd ? parseInt(pd.transport_price_per_day) : 0;
-        const days   = nights + 1;
-        const total  = perDay * days;
+        const days = nights + 1;
+        const total = perDay * days;
         rows.push({
             type: 'transport',
             label: `مواصلات - ${city}`,
@@ -129,11 +123,11 @@ async function buildPriceTable() {
 
     // 3. SIM cards — Bali price if first hotel is in Bali, otherwise Jakarta price
     {
-        const firstCity    = hotelRows[0]?.querySelector('h5')?.innerText?.trim() || '';
-        const isBali       = firstCity.includes('بالي');
+        const firstCity = hotelRows[0]?.querySelector('h5')?.innerText?.trim() || '';
+        const isBali = firstCity.includes('بالي');
         const simCardPrice = isBali ? simCardPriceBali : simCardPriceJakarta;
         const simCityLabel = isBali ? 'بالي' : 'جاكرتا';
-        const totalSim     = simCardPrice * adultsCount;
+        const totalSim = simCardPrice * adultsCount;
         rows.push({
             type: 'sim',
             label: `شرائح إنترنت - ${simCityLabel}`,
@@ -144,8 +138,11 @@ async function buildPriceTable() {
         });
     }
 
-    // 4. Inner flights
-    const _domFlightRaw   = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
+    // 4. Inner flights — auto-fill the editable domestic-flight input from passenger counts
+    //    (adults + children = full ticket, each infant = 50%). Only overwrites when the
+    //    passenger/ticket-price signature changes, so manual edits survive hotel-only rebuilds.
+    _pptAutoFillDomesticFlight(adultsCount, childrenCount, infantsCount, domesticTicketPrice);
+    const _domFlightRaw = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
     const _domFlightPrice = parseInt(_domFlightRaw) || 0;
     rows.push({ type: 'inner_flight', label: 'طيران داخلي', price: _domFlightPrice > 0 ? _domFlightPrice : null, deletable: false });
 
@@ -160,7 +157,11 @@ function _renderPriceTable(tableDiv, rows) {
     tableDiv.innerHTML = `
         <div class="ppt_wrapper">
             <div class="ppt_header">
-                <h3 class="ppt_title">جدول أسعار الباقة</h3>
+                <h3 class="ppt_title">تسعير البكج</h3>
+                <button class="ppt_reset_btn" onclick="pptRequestReset(this)" title="إعادة تعيين">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    إعادة تعيين
+                </button>
             </div>
             <table class="ppt_table">
                 <thead>
@@ -173,23 +174,33 @@ function _renderPriceTable(tableDiv, rows) {
                 <tbody id="ppt_tbody">${tbodyRows}</tbody>
             </table>
             <div class="ppt_footer_actions">
-                <button class="ppt_add_btn" id="ppt_add_outer_flight_btn" onclick="pptAddOuterFlight()">
-                    <ion-icon name="airplane-outline"></ion-icon>
-                    إضافة طيران دولي
-                </button>
                 <button class="ppt_add_btn" onclick="pptAddCustomRow()">
                     <ion-icon name="add-circle-outline"></ion-icon>
                     إضافة خدمة
                 </button>
+                <button class="ppt_add_btn" id="ppt_add_outer_flight_btn" onclick="pptAddOuterFlight()">
+                    <ion-icon name="airplane-outline"></ion-icon>
+                    إضافة طيران دولي
+                </button>
             </div>
             <div class="ppt_total_row">
                 <div class="ppt_total_item">
-                    <span class="ppt_total_label">إجمالي روبية</span>
-                    <span class="ppt_total_value" id="ppt_total_display">-</span>
+                    <div class="ppt_total_line">
+                        <span class="ppt_total_label">إجمالي روبية</span>
+                        <span class="ppt_total_value" id="ppt_total_display">-</span>
+                    </div>
+                    <div class="ppt_profit_field">
+                        <label class="ppt_profit_label" for="ppt_profit_input_id">الربح بالريال</label>
+                        <input type="text" class="ppt_profit_input" id="ppt_profit_input_id" placeholder="0"
+                               value="${window._pptProfitSar ? Number(window._pptProfitSar).toLocaleString('en-US') : ''}"
+                               oninput="pptFmtInput(this); _recalcPriceTotal()">
+                    </div>
                 </div>
                 <div class="ppt_total_item">
-                    <span class="ppt_total_label">إجمالي ريال سعودي</span>
-                    <p id="package_total_price_p_id" class="ppt_sar_value">-</p>
+                    <div class="ppt_total_line">
+                        <span class="ppt_total_label">إجمالي ريال سعودي</span>
+                        <p id="package_total_price_p_id" class="ppt_sar_value">-</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -203,8 +214,8 @@ function _buildRowHtml(row, idx) {
         ? `<span class="ppt_price_value" data-raw="${row.price}">${Number(row.price).toLocaleString('en-US')}</span>`
         : `<span class="ppt_price_value ppt_no_price" data-raw="0">لايوجد سعر</span>`;
 
-    const badgeHtml = row.badge    ? `<span class="ppt_nights_badge">${row.badge}</span>` : '';
-    const calcHtml  = row.calcNote ? `<span class="ppt_calc_note">${row.calcNote}</span>` : '';
+    const badgeHtml = row.badge ? `<span class="ppt_nights_badge">${row.badge}</span>` : '';
+    const calcHtml = row.calcNote ? `<span class="ppt_calc_note">${row.calcNote}</span>` : '';
 
     const deleteBtn = row.deletable !== false
         ? `<button class="ppt_delete_btn" onclick="pptDeleteRow(this)" title="حذف">
@@ -215,41 +226,57 @@ function _buildRowHtml(row, idx) {
         <tr class="ppt_${row.type}_row ppt_data_row" data-type="${row.type}" data-idx="${idx}">
             <td class="ppt_label_cell">
                 ${row.type === 'custom'
-                    ? `<input class="ppt_label_input" value="${row.label || ''}" placeholder="اسم الخدمة" dir="auto">`
-                    : (row.label + badgeHtml + calcHtml)
-                }
+            ? `<input class="ppt_label_input" value="${row.label || ''}" placeholder="اسم الخدمة" dir="auto">`
+            : (row.label + badgeHtml + calcHtml)
+        }
             </td>
             <td class="ppt_price_cell">${priceHtml}</td>
             <td class="ppt_action_cell">
-                <button class="ppt_edit_btn" onclick="pptRequestEdit(this)" title="تعديل">
-                    <ion-icon name="create-outline"></ion-icon>
-                </button>
-                ${deleteBtn}
+                <div class="ppt_action_btns">
+                    <button class="ppt_edit_btn" onclick="pptRequestEdit(this)" title="تعديل">
+                        <ion-icon name="create-outline"></ion-icon>
+                    </button>
+                    ${deleteBtn}
+                </div>
             </td>
         </tr>
     `;
 }
 
-// ─── Edit flow (floating confirm popover) ─────────────
+// ─── Edit / delete flow (floating confirm popover) ────
 let _pptActiveEditRow = null;
 let _pptConfirmAnchor = null;
+let _pptPendingAction = null; // 'edit' | 'delete' | 'reset'
 
 function pptRequestEdit(btn) {
     _pptActiveEditRow = btn.closest('tr');
-    _pptShowConfirmPopover(btn);
+    _pptPendingAction = 'edit';
+    _pptShowConfirmPopover(btn, 'تأكيد التعديل؟');
 }
 
-function _pptShowConfirmPopover(anchorBtn) {
+function pptDeleteRow(btn) {
+    _pptActiveEditRow = btn.closest('tr');
+    _pptPendingAction = 'delete';
+    _pptShowConfirmPopover(btn, 'تأكيد الحذف؟', true);
+}
+
+function pptRequestReset(btn) {
+    _pptActiveEditRow = null;
+    _pptPendingAction = 'reset';
+    _pptShowConfirmPopover(btn, 'إعادة تعيين الجدول؟', true);
+}
+
+function _pptShowConfirmPopover(anchorBtn, text, danger) {
     _pptRemoveConfirmPopover();
     _pptConfirmAnchor = anchorBtn;
 
     const pop = document.createElement('div');
-    pop.className = 'ppt_confirm_popover';
+    pop.className = 'ppt_confirm_popover' + (danger ? ' ppt_confirm_danger' : '');
     pop.id = 'ppt_confirm_popover';
     pop.innerHTML = `
-        <span class="ppt_confirm_popover_text">تأكيد التعديل؟</span>
+        <span class="ppt_confirm_popover_text">${text}</span>
         <div class="ppt_confirm_popover_btns">
-            <button class="ppt_confirm_yes" onclick="pptConfirmEditFromPopover()">نعم</button>
+            <button class="ppt_confirm_yes" onclick="pptConfirmPopoverAction()">نعم</button>
             <button class="ppt_confirm_no" onclick="_pptRemoveConfirmPopover()">لا</button>
         </div>
     `;
@@ -274,15 +301,15 @@ function _pptShowConfirmPopover(anchorBtn) {
 function _pptPositionConfirmPopover() {
     const pop = document.getElementById('ppt_confirm_popover');
     if (!pop || !_pptConfirmAnchor) return;
-    const rect    = _pptConfirmAnchor.getBoundingClientRect();
+    const rect = _pptConfirmAnchor.getBoundingClientRect();
     const popRect = pop.getBoundingClientRect();
-    let top  = rect.bottom + 8;
+    let top = rect.bottom + 8;
     let left = rect.left + rect.width / 2 - popRect.width / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - popRect.width - 8));
     if (top + popRect.height > window.innerHeight - 8) {
         top = rect.top - popRect.height - 8; // flip above if no room below
     }
-    pop.style.top  = top + 'px';
+    pop.style.top = top + 'px';
     pop.style.left = left + 'px';
 }
 
@@ -307,10 +334,20 @@ function _pptEscConfirm(e) {
     if (e.key === 'Escape') _pptRemoveConfirmPopover();
 }
 
-function pptConfirmEditFromPopover() {
+function pptConfirmPopoverAction() {
     const tr = _pptActiveEditRow;
+    const action = _pptPendingAction;
     _pptRemoveConfirmPopover();
-    if (tr) pptConfirmEdit(tr);
+    if (action === 'reset') { _pptPerformReset(); return; }
+    if (!tr) return;
+    if (action === 'delete') _pptPerformDelete(tr);
+    else if (action === 'edit') pptConfirmEdit(tr);
+}
+
+function _pptPerformReset() {
+    window._pptProfitSar = 0;
+    window._pptLastFlightSig = null;
+    buildPriceTable();
 }
 
 function pptConfirmEdit(tr) {
@@ -342,16 +379,16 @@ function pptConfirmEdit(tr) {
 }
 
 function pptSaveConfirmed(saveBtn) {
-    const tr        = saveBtn.closest('tr');
+    const tr = saveBtn.closest('tr');
     const priceCell = tr.querySelector('.ppt_price_cell');
-    const inp       = priceCell.querySelector('.ppt_price_input');
+    const inp = priceCell.querySelector('.ppt_price_input');
     if (!inp) return;
 
-    const raw    = inp.value.replace(/,/g, '');
+    const raw = inp.value.replace(/,/g, '');
     const numVal = parseInt(raw) || 0;
 
-    const span       = document.createElement('span');
-    span.className   = numVal > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';
+    const span = document.createElement('span');
+    span.className = numVal > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';
     span.dataset.raw = numVal;
     span.textContent = numVal > 0 ? `${Number(numVal).toLocaleString('en-US')}` : 'لايوجد سعر';
     priceCell.innerHTML = '';
@@ -362,12 +399,12 @@ function pptSaveConfirmed(saveBtn) {
 }
 
 function pptCancelConfirmed(cancelBtn) {
-    const tr        = cancelBtn.closest('tr');
+    const tr = cancelBtn.closest('tr');
     const priceCell = tr.querySelector('.ppt_price_cell');
-    const origRaw   = parseInt(cancelBtn.dataset.orig) || 0;
+    const origRaw = parseInt(cancelBtn.dataset.orig) || 0;
 
-    const span       = document.createElement('span');
-    span.className   = origRaw > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';
+    const span = document.createElement('span');
+    span.className = origRaw > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';
     span.dataset.raw = origRaw;
     span.textContent = origRaw > 0 ? `${Number(origRaw).toLocaleString('en-US')}` : 'لايوجد سعر';
     priceCell.innerHTML = '';
@@ -378,26 +415,28 @@ function pptCancelConfirmed(cancelBtn) {
 }
 
 function _restoreEditBtn(actionCell, tr) {
-    const isCustom  = tr.classList.contains('ppt_custom_row') || tr.dataset.type === 'outer_flight';
+    const isCustom = tr.classList.contains('ppt_custom_row') || tr.dataset.type === 'outer_flight';
     const deleteBtn = isCustom
         ? `<button class="ppt_delete_btn" onclick="pptDeleteRow(this)" title="حذف"><ion-icon name="close-outline"></ion-icon></button>`
         : '';
     actionCell.innerHTML = `
-        <button class="ppt_edit_btn" onclick="pptRequestEdit(this)" title="تعديل">
-            <ion-icon name="create-outline"></ion-icon>
-        </button>
-        ${deleteBtn}
+        <div class="ppt_action_btns">
+            <button class="ppt_edit_btn" onclick="pptRequestEdit(this)" title="تعديل">
+                <ion-icon name="create-outline"></ion-icon>
+            </button>
+            ${deleteBtn}
+        </div>
     `;
 }
 
 function pptFmtInput(inp) {
-    const oldVal             = inp.value;
-    const cursorPos          = inp.selectionStart;
+    const oldVal = inp.value;
+    const cursorPos = inp.selectionStart;
     const digitsBeforeCursor = oldVal.slice(0, cursorPos).replace(/[^0-9]/g, '').length;
 
-    const raw    = oldVal.replace(/[^0-9]/g, '');
+    const raw = oldVal.replace(/[^0-9]/g, '');
     const newVal = raw === '' ? '' : Number(raw).toLocaleString('en-US');
-    inp.value    = newVal;
+    inp.value = newVal;
 
     let digits = 0;
     let newPos = newVal.length;
@@ -444,7 +483,8 @@ function pptAddCustomRow() {
                        onkeydown="if(event.key==='Enter'){this.closest('tr').querySelector('.ppt_save_inline_btn').click()} else if(event.key==='Escape'){this.closest('tr').querySelector('.ppt_cancel_inline_btn').click()}">
             </td>
             <td class="ppt_price_cell">
-                <span class="ppt_price_value ppt_no_price" data-raw="0">لايوجد سعر</span>
+                <input class="ppt_price_input" value="" placeholder="السعر" oninput="pptFmtInput(this)"
+                       onkeydown="if(event.key==='Enter'){this.closest('tr').querySelector('.ppt_save_inline_btn').click()} else if(event.key==='Escape'){this.closest('tr').querySelector('.ppt_cancel_inline_btn').click()}">
             </td>
             <td class="ppt_action_cell">
                 <div class="ppt_inline_actions">
@@ -458,21 +498,36 @@ function pptAddCustomRow() {
     if (input) input.focus();
 }
 
-// Confirm a freshly added custom row: lock in the name, swap to edit/delete buttons
+// Confirm a freshly added custom row: lock in the name + price, swap to edit/delete buttons
 function pptConfirmNewCustomRow(btn) {
-    const tr    = btn.closest('tr');
-    const input = tr.querySelector('.ppt_label_input');
-    const name  = (input?.value || '').trim();
+    const tr = btn.closest('tr');
+    const nameInput = tr.querySelector('.ppt_label_input');
+    const priceInput = tr.querySelector('.ppt_price_input');
+    const name = (nameInput?.value || '').trim();
 
     if (name === '') {
-        input.focus();
-        input.style.borderColor = '#d32f2f';
-        setTimeout(() => { input.style.borderColor = ''; }, 1200);
+        nameInput.focus();
+        nameInput.style.borderColor = '#d32f2f';
+        setTimeout(() => { nameInput.style.borderColor = ''; }, 1200);
         return;
     }
 
+    const numVal = parseInt((priceInput?.value || '').replace(/,/g, '')) || 0;
+
+    // Lock in the name as plain text
     tr.querySelector('.ppt_label_cell').textContent = name;
+
+    // Lock in the price as a value span
+    const priceCell = tr.querySelector('.ppt_price_cell');
+    const span = document.createElement('span');
+    span.className = numVal > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';
+    span.dataset.raw = numVal;
+    span.textContent = numVal > 0 ? Number(numVal).toLocaleString('en-US') : 'لايوجد سعر';
+    priceCell.innerHTML = '';
+    priceCell.appendChild(span);
+
     _restoreEditBtn(tr.querySelector('.ppt_action_cell'), tr);
+    _recalcPriceTotal();
 }
 
 // Cancel a freshly added custom row: discard it entirely
@@ -488,9 +543,8 @@ function _appendDynamicRow(row) {
     tbody.insertAdjacentHTML('beforeend', _buildRowHtml({ ...row, price: null }, idx));
 }
 
-// ─── Delete row ───────────────────────────────────────
-function pptDeleteRow(btn) {
-    const tr = btn.closest('tr');
+// ─── Delete row (after popover confirmation) ──────────
+function _pptPerformDelete(tr) {
     const wasOuterFlight = tr.dataset.type === 'outer_flight';
     tr.remove();
     if (wasOuterFlight) _pptToggleOuterFlightBtn(true); // restore the add button
@@ -508,14 +562,52 @@ function _recalcPriceTotal() {
     if (idrDisplay) idrDisplay.textContent = total > 0 ? `${Number(total).toLocaleString('en-US')} IDR` : '-';
 
     const exchangeRate = window._pptSettings?.exchangeRate || 4700;
-    const sarTotal     = total > 0 ? Math.round(total / exchangeRate) : 0;
-    const sarDisplay   = document.getElementById('package_total_price_p_id');
+    const sarBase = total > 0 ? Math.round(total / exchangeRate) : 0;
+
+    // Profit (SAR) entered by the user, added on top of the converted package price
+    const profitInput = document.getElementById('ppt_profit_input_id');
+    const profit = profitInput ? (parseInt(profitInput.value.replace(/,/g, '')) || 0) : 0;
+    window._pptProfitSar = profit; // persist across rebuilds
+
+    const sarTotal = sarBase + profit;
+    const sarDisplay = document.getElementById('package_total_price_p_id');
     if (sarDisplay) sarDisplay.textContent = sarTotal > 0 ? `${Number(sarTotal).toLocaleString('en-US')} SAR` : '-';
+}
+
+// ─── Passenger parsing ────────────────────────────────
+// Reads strings like "2 بالغين" or "2 بالغين + 2 أطفال + 1 رضيع"
+function _pptParsePassengers(txt) {
+    let adults = 0, children = 0, infants = 0;
+    (txt || '').split('+').forEach(seg => {
+        const m = seg.match(/\d+/);
+        if (!m) return;
+        const n = parseInt(m[0]);
+        if (seg.includes('رض')) infants += n; // رضيع / رضاع
+        else if (seg.includes('طف')) children += n; // طفل / أطفال
+        else if (seg.includes('بالغ')) adults += n; // بالغ / بالغين
+    });
+    return { adults, children, infants };
+}
+
+// Auto-fill the domestic-flight input: (adults + children) full ticket, each infant 50%.
+// Skips when the passenger/price signature is unchanged so manual edits aren't clobbered.
+function _pptAutoFillDomesticFlight(adults, children, infants, ticketPrice) {
+    const input = document.getElementById('domestic_flight_price_input_id');
+    if (!input) return;
+
+    const signature = `${adults}|${children}|${infants}|${ticketPrice}`;
+    if (window._pptLastFlightSig === signature) return;
+    window._pptLastFlightSig = signature;
+
+    const autoTotal = ticketPrice > 0
+        ? Math.round((adults + children) * ticketPrice + infants * ticketPrice * 0.5)
+        : 0;
+    input.value = autoTotal > 0 ? Number(autoTotal).toLocaleString('en-US') : '';
 }
 
 // ─── Domestic flight price sync ───────────────────────
 function updateDomesticFlightPrice() {
-    const raw    = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
+    const raw = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
     const numVal = parseInt(raw) || 0;
 
     const row = document.querySelector('#ppt_tbody tr[data-type="inner_flight"]');
@@ -525,7 +617,7 @@ function updateDomesticFlightPrice() {
     if (!span) return;
 
     span.dataset.raw = numVal;
-    span.className   = numVal > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';
+    span.className = numVal > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';
     span.textContent = numVal > 0 ? `${Number(numVal).toLocaleString('en-US')}` : 'لايوجد سعر';
 
     _recalcPriceTotal();

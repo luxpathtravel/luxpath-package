@@ -189,23 +189,30 @@ async function loadSettings() {
             const inp = document.getElementById('sim_price_jakarta_input');
             if (inp) inp.value = Number(row.value).toLocaleString('en-US');
         }
+        if (row.key === 'domestic_flight_ticket_price') {
+            const inp = document.getElementById('domestic_flight_ticket_price_input');
+            if (inp) inp.value = Number(row.value).toLocaleString('en-US');
+        }
     });
 }
 
 async function saveSettings() {
-    const rateRaw     = document.getElementById('exchange_rate_input').value.replace(/,/g, '');
-    const simBaliRaw  = document.getElementById('sim_price_bali_input').value.replace(/,/g, '');
-    const simJktRaw   = document.getElementById('sim_price_jakarta_input').value.replace(/,/g, '');
-    const rateVal     = parseInt(rateRaw)    || 0;
-    const simBaliVal  = parseInt(simBaliRaw) || 0;
-    const simJktVal   = parseInt(simJktRaw)  || 0;
+    const rateRaw      = document.getElementById('exchange_rate_input').value.replace(/,/g, '');
+    const simBaliRaw   = document.getElementById('sim_price_bali_input').value.replace(/,/g, '');
+    const simJktRaw    = document.getElementById('sim_price_jakarta_input').value.replace(/,/g, '');
+    const domFlightRaw = document.getElementById('domestic_flight_ticket_price_input').value.replace(/,/g, '');
+    const rateVal      = parseInt(rateRaw)      || 0;
+    const simBaliVal   = parseInt(simBaliRaw)   || 0;
+    const simJktVal    = parseInt(simJktRaw)    || 0;
+    const domFlightVal = parseInt(domFlightRaw) || 0;
 
     const statusEl = document.getElementById('settings_status');
 
     const { error } = await db.from('package_settings').upsert([
-        { key: 'exchange_rate',         value: String(rateVal),   updated_at: new Date().toISOString() },
-        { key: 'sim_card_price_bali',   value: String(simBaliVal), updated_at: new Date().toISOString() },
-        { key: 'sim_card_price_jakarta', value: String(simJktVal), updated_at: new Date().toISOString() }
+        { key: 'exchange_rate',                value: String(rateVal),      updated_at: new Date().toISOString() },
+        { key: 'sim_card_price_bali',          value: String(simBaliVal),   updated_at: new Date().toISOString() },
+        { key: 'sim_card_price_jakarta',       value: String(simJktVal),    updated_at: new Date().toISOString() },
+        { key: 'domestic_flight_ticket_price', value: String(domFlightVal), updated_at: new Date().toISOString() }
     ]);
 
     if (error) {

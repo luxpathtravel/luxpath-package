@@ -22,28 +22,6 @@ function _buildHotelLastDivAttrs(hotelName, roomTypeEn, isNewWriting) {
     return `class="hotel-row-url-cell" data-hotel-name="${hn}" data-room-type-en="${rte}" data-is-new-writing="${isNewWriting}"${urlAttr}`;
 }
 
-/* On localhost, replace "localhost" with the machine's LAN IP so PDF links embedded as
-   http://192.168.x.x:PORT/_r.html?to=... are reachable from phones on the same Wi-Fi.
-   On a real HTTPS deployment _pageOriginForRedirect stays as window.location.origin. */
-var _pageOriginForRedirect = window.location.origin;
-(function () {
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') return;
-    try {
-        var _rpc = new RTCPeerConnection({ iceServers: [] });
-        _rpc.createDataChannel('');
-        _rpc.createOffer().then(function (sdp) { _rpc.setLocalDescription(sdp); }).catch(function () {});
-        _rpc.onicecandidate = function (ev) {
-            if (!ev || !ev.candidate || !ev.candidate.candidate) return;
-            var m = ev.candidate.candidate.match(/\b((?:192\.168|10\.|172\.(?:1[6-9]|2\d|3[01]))\.\d+\.\d+)\b/);
-            if (m) {
-                _pageOriginForRedirect = window.location.protocol + '//' + m[1] +
-                    (window.location.port ? ':' + window.location.port : '');
-                try { _rpc.close(); } catch (_) {}
-            }
-        };
-        setTimeout(function () { try { _rpc.close(); } catch (_) {} }, 3000);
-    } catch (_) {}
-})();
 
 function _prepareUrlForOpen(url) {
     if (!url) return url;
@@ -56,17 +34,8 @@ function _prepareUrlForOpen(url) {
                 const cleanPath = u.pathname.replace(/(\.[a-z]{2}(-[a-z]{2})?)?\.html$/i, '.en-gb.html');
                 finalUrl = u.origin + cleanPath + u.search + u.hash;
             }
-            // Route through _r.html on the same origin so the initial URL seen by the OS
-            // is not booking.com — this prevents iOS Universal Links / Android App Links
-            // from auto-opening the Booking.com app. The hotel page opens in the browser.
-            // Falls back to the direct URL when running from file:// (local dev without server).
-            try {
-                const _base = _pageOriginForRedirect;
-                if (_base && _base !== 'null' && !_base.startsWith('file:') && !_base.includes('localhost') && !/\/\/127\./.test(_base)) {
-                    const _dir = window.location.pathname.replace(/[^/]*$/, '');
-                    return _base + _dir + '_r.html?to=' + encodeURIComponent(finalUrl);
-                }
-            } catch (_e) {}
+            // Open the Booking.com URL directly (locale-normalized above) so the exact URL set in the
+            // admin page is what opens — previously this was wrapped through an _r.html?to=... redirect.
             return finalUrl;
         }
     } catch (e) {}
@@ -76,6 +45,8 @@ function _prepareUrlForOpen(url) {
 /* Click handler for hotel row URL cells (event delegation) */
 (function () {
     document.addEventListener('click', function (e) {
+        /* DISABLED on the website: hotel row URLs must open only from the PDF (via the embedded PDF links), not on the webpage */
+        return;
         if (e.target.closest('.hotel_row_image_controller')) return;
         const urlCell = e.target.closest('.hotel-row-url-cell');
         if (!urlCell || !urlCell.closest('.hotel_row_class_for_editing')) return;
@@ -632,6 +603,10 @@ createWholePackageAndClintDataFunction = function () {
 
         /* Show up the 'downloaded_pdf_clint_data_page' section */
         document.getElementById('downloaded_pdf_clint_data_page').style.display = 'block';
+
+
+        /* Refresh the SIM card + domestic flight prices in the package price table */
+        if (typeof pptRefreshFromClintData === 'function') pptRefreshFromClintData();
     }
 }
 
@@ -3460,8 +3435,27 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
 
 
 
+    /* By default keep the manual Booking.com URL input hidden — it's only shown for manually-written hotels below */
+    document.getElementById('hotel_booking_url_input_id').style.display = 'none';
+    document.getElementById('hotel_booking_url_input_id').value = '';
+
+
     /* Check if the clicked hotel row has a class name of 'new_hotel_data_by_user_writing_class' or no (hotel inserted by picking or writing) */
     if (clickedHotelDataDiv.classList.contains('new_hotel_data_by_user_writing_class')) {
+
+        /* Show the Booking.com URL input and fill it with this hotel row's stored booking link,
+           so the manually-written hotel's URL can be reviewed/edited while editing the row. */
+        const _editHotelUrlCell = clickedHotelDataDiv.querySelector('.hotel-row-url-cell');
+        let _editHotelBookingUrl = _editHotelUrlCell ? (_editHotelUrlCell.dataset.url || '') : '';
+        if (!_editHotelBookingUrl && _editHotelUrlCell) {
+            _editHotelBookingUrl = _resolveHotelRowUrl(
+                _editHotelUrlCell.dataset.hotelName,
+                _editHotelUrlCell.dataset.roomTypeEn,
+                _editHotelUrlCell.dataset.isNewWriting === 'true'
+            );
+        }
+        document.getElementById('hotel_booking_url_input_id').style.display = 'block';
+        document.getElementById('hotel_booking_url_input_id').value = _editHotelBookingUrl;
         // Enter the values of the clicked hotel row div to inputs
         document.getElementById('hotel_location_input_id').value = hotelLocationText;
         document.getElementById('hotel_bali_area_input_id').value = hotelBaliAreaInput;
@@ -3623,6 +3617,11 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
         document.getElementById('hotel_room_extra_info_textarea_id_2').value = '';
 
 
+        /* Clear the safe-side total price inputs */
+        document.getElementById('hotel_safe_side_price_input_id').value = '';
+        document.getElementById('hotel_safe_side_price_input_id_2').value = '';
+
+
         /* Hide and show different icons */
         document.getElementById('hotel_inputs_submit_icon').style.display = 'block';
         document.getElementById('change_insert_hotel_data_system_icon').style.display = 'block';
@@ -3632,6 +3631,11 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
         document.getElementById('cancel_new_hotel_data_row_icon').style.display = 'none';
         document.getElementById('show_or_hide_second_room_inputs_div_icon_2').style.display = 'none';
         document.getElementById('change_insert_hotel_data_system_icon_2').style.display = 'none';
+
+
+        /* Hide and clear the manual Booking.com URL input when cancelling the hotel row edit/creation */
+        document.getElementById('hotel_booking_url_input_id').style.display = 'none';
+        document.getElementById('hotel_booking_url_input_id').value = '';
 
 
 
@@ -4989,13 +4993,15 @@ function createHotelDragAndDropMood() {
             sourceRow,
             startY: event.clientY,
             ghostInitialTop: rect.top,
+            // Snapshot the hotels order at drag start so we can tell if the arrangement actually changed on drop
+            initialOrder: [...dropZone.querySelectorAll('.hotel_row_class')],
         };
     }
 
     function finishHotelRowDrag() {
         if (!_hotelDrag) return;
 
-        const { ghost, sourceRow } = _hotelDrag;
+        const { ghost, sourceRow, initialOrder } = _hotelDrag;
         _hotelDrag = null;
 
         ghost.remove();
@@ -5003,6 +5009,18 @@ function createHotelDragAndDropMood() {
         document.body.classList.remove('is-dragging');
 
         handleDrop();
+
+        // If the hotels arrangement actually changed after the drop, rebuild the transportation
+        // (clint movements) data automatically so it matches the new hotels order.
+        const finalOrder = [...dropZone.querySelectorAll('.hotel_row_class')];
+        const orderChanged =
+            finalOrder.length !== initialOrder.length ||
+            finalOrder.some((row, index) => row !== initialOrder[index]);
+
+        if (orderChanged && typeof autoCreateALlClintMovementsData === 'function') {
+            // Pass true so a drag-triggered rebuild keeps the section's current visibility (won't reveal it if it was hidden)
+            autoCreateALlClintMovementsData(true);
+        }
     }
 
     function clearPointerSessionListeners() {
@@ -5122,7 +5140,11 @@ function createHotelDragAndDropMood() {
 /* Down All Functions For Clint Movements Data Down */
 
 /* Function to automaticlly create all clint movements data */
-autoCreateALlClintMovementsData = function () {
+autoCreateALlClintMovementsData = function (preservePageVisibility) {
+
+    /* Remember the clint movements section's visibility before rebuilding, so a drag-triggered
+       rebuild (preservePageVisibility = true) can restore it and avoid revealing a hidden section. */
+    const clintMovementsPageInitialDisplay = document.getElementById('downloaded_pdf_clint_movements_data_page').style.display;
     /* if one of the clint data or hotel data sections is hidden then stop the process */
     if (document.getElementById('downloaded_pdf_clint_data_page').style.display === 'none' || document.getElementById('downloaded_pdf_hotel_data_page').style.display === 'none') {
 
@@ -5461,6 +5483,19 @@ autoCreateALlClintMovementsData = function () {
 
         /* Call a function to highlight the Saturday and Sanday days */
         highlightWeekendClintMovements();
+
+
+        /* Make sure the rebuilt transportation rows are visible:
+           - Normal icon click (preservePageVisibility is falsy): reveal the section AND its inner rows
+             container (the inner container can stay hidden even when the section itself is shown).
+           - Triggered by a hotel-rows drag (preservePageVisibility = true): keep the section's original
+             visibility, so a hidden section stays hidden and only its data gets refreshed. */
+        if (preservePageVisibility) {
+            document.getElementById('downloaded_pdf_clint_movements_data_page').style.display = clintMovementsPageInitialDisplay;
+        } else {
+            document.getElementById('downloaded_pdf_clint_movements_data_page').style.display = 'block';
+            document.getElementById('inserted_clint_movements_data_position_div').style.display = 'block';
+        }
     }
 }
 

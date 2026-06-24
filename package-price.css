@@ -21,12 +21,12 @@
     box-shadow: 0 2px 14px rgba(0,0,0,0.09);
 }
 
-/* Header bar */
+/* Header bar — TEST COLOR red: if you see red here, new CSS is loaded */
 .ppt_header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgb(0, 87, 116);
+    background: #c62828;
     padding: 12px 16px;
 }
 
@@ -37,41 +37,85 @@
     font-weight: 600;
 }
 
+.ppt_reset_btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 7px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.14s;
+    white-space: nowrap;
+}
 
-/* Table */
+.ppt_reset_btn:hover {
+    background: rgba(255, 255, 255, 0.26);
+}
+
+.ppt_reset_btn ion-icon {
+    font-size: 15px;
+}
+
+
+/* Table — fixed layout so columns/rows don't shift while editing */
 .ppt_table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
 }
+
+/* Static column widths */
+.ppt_table th:nth-child(1), .ppt_table td:nth-child(1) { width: 38%; }
+.ppt_table th:nth-child(2), .ppt_table td:nth-child(2) { width: 42%; }
+.ppt_table th:nth-child(3), .ppt_table td:nth-child(3) { width: 20%; }
 
 .ppt_table thead th {
     background: rgb(0, 57, 80);
     color: rgba(255,255,255,0.85);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    padding: 8px 12px;
+    padding: 9px 12px;
     text-align: right;
 }
 
 .ppt_table tbody tr {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #aab8be;
     transition: background 0.12s;
+}
+
+/* Constant row height + vertical centering so editing widgets don't change the layout */
+.ppt_table tbody td {
+    height: 64px;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+/* Keep long service/hotel names from breaking the fixed columns */
+.ppt_label_cell {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .ppt_table tbody tr:last-child { border-bottom: none; }
 .ppt_table tbody tr:hover { background: #f5fafc; }
 
 /* Row type icons */
-.ppt_hotel_row td:first-child::before      { content: "🏨 "; font-size: 13px; }
-.ppt_transport_row td:first-child::before  { content: "🚗 "; font-size: 13px; }
-.ppt_sim_row td:first-child::before        { content: "📶 "; font-size: 13px; }
-.ppt_flight_row td:first-child::before     { content: "✈️ "; font-size: 13px; }
-.ppt_custom_row td:first-child::before     { content: "➕ "; font-size: 13px; }
+.ppt_hotel_row td:first-child::before         { content: "🏨 "; font-size: 13px; }
+.ppt_transport_row td:first-child::before     { content: "🚗 "; font-size: 13px; }
+.ppt_sim_row td:first-child::before           { content: "📶 "; font-size: 13px; }
+.ppt_inner_flight_row td:first-child::before  { content: "✈️ "; font-size: 13px; }
+.ppt_outer_flight_row td:first-child::before  { content: "✈️ "; font-size: 13px; }
+.ppt_custom_row td:first-child::before        { content: "➕ "; font-size: 13px; }
 
 /* Table cells */
 .ppt_label_cell {
     padding: 11px 12px;
-    font-size: 13px;
+    font-size: 14px;
     color: #222;
     min-width: 140px;
 }
@@ -96,19 +140,22 @@
 
 .ppt_price_cell {
     padding: 11px 12px;
-    font-size: 13px;
+    font-size: 14px;
     min-width: 165px;
     white-space: nowrap;
 }
 
+/* TEST COLOR orange: if you see orange prices, new CSS is loaded */
 .ppt_price_value {
-    font-weight: 600;
-    color: #1a6b36;
+    font-weight: 700;
+    color: rgb(1, 163, 1);
+    font-size: 16px;
 }
 
 .ppt_no_price {
     color: #d32f2f !important;
     font-weight: 600;
+    font-size: 13px;
 }
 
 /* Action cell — flexible width to fit confirm/save/cancel widgets */
@@ -145,11 +192,19 @@
     color: #d32f2f;
     font-size: 14px;
     line-height: 1;
-    margin-right: 4px;
     transition: background 0.12s;
 }
 
 .ppt_delete_btn:hover { background: #fff0f0; }
+
+/* Edit/delete button wrapper — row on desktop, column on mobile, centered */
+.ppt_action_btns {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+}
 
 /* Slightly bigger action-cell icons */
 .ppt_action_cell ion-icon {
@@ -191,7 +246,7 @@
     white-space: nowrap;
 }
 
-/* Floating confirm popover (replaces inline تأكيد؟) */
+/* Floating confirm popover */
 .ppt_confirm_popover {
     position: fixed;
     z-index: 10000;
@@ -222,12 +277,17 @@
     color: #333;
 }
 
+/* Delete confirmation — red "نعم" to flag the destructive action */
+.ppt_confirm_popover.ppt_confirm_danger .ppt_confirm_yes {
+    background: #d32f2f;
+}
+
 .ppt_confirm_popover_btns {
     display: flex;
     gap: 10px;
 }
 
-/* Bigger, easier-to-tap buttons inside the floating popover */
+/* Bigger buttons inside the floating popover */
 .ppt_confirm_popover .ppt_confirm_yes,
 .ppt_confirm_popover .ppt_confirm_no {
     padding: 9px 24px;
@@ -262,11 +322,11 @@
 /* Editable price input in table */
 .ppt_price_input {
     width: 100%;
-    max-width: 170px;
-    padding: 8px 10px;
+    max-width: 110px;
+    padding: 4px 6px;
     border: 1.5px solid rgb(0, 87, 116);
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 12px;
     text-align: left;
     direction: ltr;
     font-family: inherit;
@@ -279,30 +339,36 @@
 }
 
 .ppt_price_input::placeholder {
-    font-size: 12px;
-    opacity: 0.7;
+    font-size: 9px;
+    opacity: 0.65;
 }
 
 /* Label input for custom rows */
 .ppt_label_input {
     width: 100%;
-    padding: 6px 8px;
+    max-width: 100%;
+    padding: 4px 6px;
     border: 1.5px solid rgb(0, 87, 116);
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 11px;
     font-family: inherit;
     outline: none;
     background: white;
     box-sizing: border-box;
 }
 
+.ppt_label_input::placeholder {
+    font-size: 9px;
+    opacity: 0.65;
+}
+
 /* Footer action buttons */
 .ppt_footer_actions {
     display: flex;
+    align-items: flex-start;
     gap: 8px;
     padding: 10px 12px;
     border-top: 1px solid #f0f0f0;
-    flex-wrap: wrap;
 }
 
 .ppt_add_btn {
@@ -328,19 +394,76 @@
     pointer-events: none;
 }
 
+/* Profit (الربح بالريال) field — sits under the إجمالي روبية line */
+.ppt_profit_field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ppt_profit_label {
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ppt_profit_input {
+    width: 76px;
+    max-width: 48%;
+    padding: 4px 7px;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+    background: white;
+    color: rgb(0, 87, 116);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    direction: ltr;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.ppt_profit_input::placeholder {
+    font-size: 9px;
+    opacity: 0.6;
+}
+
+.ppt_profit_input:focus {
+    border-color: white;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
 /* Total row — two columns (IDR + SAR) */
 .ppt_total_row {
     display: flex;
     background: rgb(0, 87, 116);
     color: white;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .ppt_total_item {
     flex: 1;
-    padding: 12px 16px;
+    min-width: 0;
+    padding: 16px 18px;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.ppt_total_line {
+    display: flex;
+    align-items: baseline;
     justify-content: space-between;
-    gap: 4px;
+    gap: 8px;
+    min-width: 0;
 }
 
 .ppt_total_item + .ppt_total_item {
@@ -348,26 +471,34 @@
 }
 
 .ppt_total_label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
-    opacity: 0.82;
+    opacity: 0.85;
     letter-spacing: 0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .ppt_total_value {
-    font-size: 16px;
+    font-size: 21px;
     font-weight: 700;
     direction: ltr;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ppt_sar_value {
-    font-size: 16px;
+    font-size: 21px;
     font-weight: 700;
     direction: ltr;
-    letter-spacing: 0.5px;
-    color: #a8e6c0;
+    letter-spacing: 0.4px;
+    color: rgb(242, 255, 0);
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Safe side price inputs — centered */
@@ -392,7 +523,7 @@
     .ppt_label_cell,
     .ppt_price_cell {
         font-size: 12px;
-        padding: 9px 8px;
+        padding: 8px 7px;
     }
 
     .ppt_action_cell {
@@ -403,7 +534,8 @@
     .ppt_total_row    { flex-direction: column; }
     .ppt_total_item + .ppt_total_item { border-right: none; border-top: 1px solid rgba(255,255,255,0.2); }
     .ppt_total_value,
-    .ppt_sar_value    { font-size: 14px; }
+    .ppt_sar_value    { font-size: 16px; }
+    .ppt_total_label  { font-size: 11px; }
     .ppt_calc_note, .ppt_nights_badge { display: none; }
     .ppt_footer_actions { gap: 6px; }
     .ppt_add_btn { font-size: 11px; padding: 6px 10px; }
@@ -411,8 +543,35 @@
     .ppt_save_inline_btn,
     .ppt_cancel_inline_btn { font-size: 17px; }
 
-    .ppt_price_cell { min-width: 90px; }
-    .ppt_price_input { font-size: 14px; padding: 7px 8px; max-width: 120px; }
+    /* Stack action buttons vertically on small screens */
+    .ppt_action_btns,
+    .ppt_inline_actions { flex-direction: column; }
+
+    /* Use zoom to visually shrink inputs without triggering iOS minimum font-size enforcement */
+    .ppt_price_input {
+        font-size: 14px;
+        zoom: 0.76;
+        max-width: 130px;
+        padding: 4px 6px;
+    }
+    .ppt_price_input::placeholder { font-size: 11px; opacity: 0.65; }
+
+    .ppt_label_input {
+        font-size: 14px;
+        zoom: 0.7;
+        padding: 4px 6px;
+    }
+    .ppt_label_input::placeholder { font-size: 11px; opacity: 0.65; }
+
+    /* Profit input — smaller on mobile */
+    .ppt_profit_label { font-size: 10px; }
+    .ppt_profit_input {
+        font-size: 14px;
+        zoom: 0.72;
+        width: 44px;
+        padding: 3px 5px;
+    }
+    .ppt_profit_input::placeholder { font-size: 11px; }
 
     /* Larger floating confirm popover for easier tapping */
     .ppt_confirm_popover { padding: 14px 18px; gap: 13px; }

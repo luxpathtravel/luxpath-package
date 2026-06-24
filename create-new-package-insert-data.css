@@ -2657,15 +2657,6 @@ body.is-dragging * {
     text-align: center !important;
 }
 
-#downloaded_pdf_total_price_data_page #package_total_price_p_id {
-    font-size: clamp(26px, 7vw, 58px) !important;
-    font-weight: 900 !important;
-    color: #1C3D2E !important;
-    text-align: center !important;
-    direction: rtl !important;
-    line-height: 1.1 !important;
-}
-
 #pdf_price_reveal_disclaimer_p {
     font-size: clamp(8px, 1.2vw, 14px) !important;
     color: #666 !important;
