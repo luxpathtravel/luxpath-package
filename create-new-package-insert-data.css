@@ -204,7 +204,7 @@
 }
 
 .pdf_section_title_div_class p {
-    font-size: 4.5vw;
+    font-size: 5.2vw;
     margin-right: 5px;
 }
 
@@ -644,7 +644,7 @@ body.is-dragging * {
     text-align: center;
     box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.15);
     transform: translate(-50%, -130vh);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ensure_your_delete_action button {
@@ -858,7 +858,7 @@ body.is-dragging * {
     }
 
     .pdf_section_title_div_class p {
-        font-size: 5.5vw;
+        font-size: 6.2vw;
     }
 
 
@@ -1000,7 +1000,7 @@ body.is-dragging * {
     }
 
     .pdf_section_title_div_class p {
-        font-size: 6.5vw;
+        font-size: 7.2vw;
     }
 
 
@@ -1376,7 +1376,7 @@ body.is-dragging * {
     border-radius: 30px !important;
     border-top-left-radius: 30px !important;
     border-bottom-left-radius: 30px !important;
-    padding: 7px 26px !important;
+    padding: 3px 20px !important;
     font-size: clamp(12px, 2.2vw, 21px) !important;
     font-weight: 700 !important;
     border: 2px solid #C9A84C !important;
@@ -2032,7 +2032,7 @@ body.is-dragging * {
 #downloaded_pdf_package_including_data_page .pdf_section_title_div_class {
     justify-content: center !important;
     background: transparent !important;
-    padding: 8px 16px 6px !important;
+    padding: 5px 16px !important;
     margin: 4px 0 !important;
 }
 
@@ -2047,7 +2047,7 @@ body.is-dragging * {
 }
 
 #downloaded_pdf_package_including_data_page .pdf_section_title_div_class p {
-    font-size: clamp(12px, 2.2vw, 21px) !important;
+    font-size: clamp(14px, 2.6vw, 24px) !important;
     margin-right: 8px !important;
     margin-left: 0 !important;
 }

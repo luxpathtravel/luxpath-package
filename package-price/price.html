@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الأسعار</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Password Gate -->
+    <div id="pw_gate" class="pw_gate">
+        <div class="pw_card">
+            <h2>لوحة تحكم الأسعار</h2>
+            <p style="color:#666; font-size:14px; margin-bottom:20px; text-align:center;">أدخل كلمة المرور للدخول</p>
+            <input type="password" id="pw_input" placeholder="كلمة المرور" autocomplete="current-password">
+            <div id="pw_error" class="pw_error"></div>
+            <button onclick="checkPassword()">دخول</button>
+        </div>
+    </div>
+
+    <!-- Dashboard (hidden until authenticated) -->
+    <div id="dashboard" style="display:none;">
+
+        <div class="dash_header">
+            <h1>لوحة تحكم الأسعار</h1>
+            <p>إدارة أسعار النقل والإعدادات العامة</p>
+        </div>
+
+        <div class="dash_main">
+            <div id="status_msg" class="status_msg"></div>
+
+            <!-- Global Settings Card -->
+            <div class="settings_card">
+                <h2 class="settings_title">الإعدادات العامة</h2>
+                <div class="settings_grid">
+                    <div class="settings_field">
+                        <label for="exchange_rate_input">سعر الصرف (كم IDR في الريال الواحد)</label>
+                        <input type="text" id="exchange_rate_input" class="price_inp" placeholder="4,700"
+                            oninput="fmtInp(this)">
+                    </div>
+                    <div class="settings_field">
+                        <label for="sim_price_bali_input">شريحة إنترنت — بالي (IDR)</label>
+                        <input type="text" id="sim_price_bali_input" class="price_inp" placeholder="150,000"
+                            oninput="fmtInp(this)">
+                    </div>
+                    <div class="settings_field">
+                        <label for="sim_price_jakarta_input">شريحة إنترنت — جاكرتا (IDR)</label>
+                        <input type="text" id="sim_price_jakarta_input" class="price_inp" placeholder="120,000"
+                            oninput="fmtInp(this)">
+                    </div>
+                </div>
+                <button class="save_settings_btn" onclick="saveSettings()">حفظ الإعدادات</button>
+                <div id="settings_status" class="settings_status"></div>
+            </div>
+
+            <!-- City Transport Prices Table -->
+            <div class="table_wrap">
+                <table class="prices_tbl">
+                    <thead>
+                        <tr>
+                            <th>المدينة</th>
+                            <th>السعر باليوم</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prices_tbody">
+                        <tr>
+                            <td colspan="3" style="text-align:center; padding:24px; color:#888;">جاري التحميل...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>

@@ -702,13 +702,25 @@ createAllPackageIncludingAndNotIncludingData = function () {
         'bali_taxes_not_covered_checkbox'
     ];
 
+    const _priceTableDiv = document.getElementById('package_price_table_div');
+    const _tableNotBuilt = !_priceTableDiv || _priceTableDiv.dataset.built !== 'true';
+    const _hasMissingPrice = !_tableNotBuilt && _priceTableDiv.innerText.includes('لايوجد سعر');
+    if (_tableNotBuilt || _hasMissingPrice) {
+        playSoundEffect('error');
+        package_including_data_inputs_submit_icon.style.backgroundColor = 'rgb(255, 0, 0)';
+        setTimeout(() => {
+            package_including_data_inputs_submit_icon.style.backgroundColor = 'rgb(0, 87, 116)';
+        }, 500);
+        return;
+    }
+
     playSoundEffect('success');
 
     let privetCarWithDriverToWelcomeAndEtc = document.getElementById('specific_car_type_input_id').value;
     let packageIncludingDataTextArea = document.getElementById('package_details_textarea_id').value;
     let smsCardWithInternetAmountInputReayText = document.getElementById('sms_card_with_internet_amount_input_id').value;
     let innerFlightTicketsAmountInputReayText = document.getElementById('inner_flight_tickets_amount_input_id').value;
-    let packageTotlaPriceInput = document.getElementById('package_totla_price_input_id').value;
+    let packageTotlaPriceInput = (document.getElementById('package_total_price_p_id')?.innerText || '').trim();
 
     package_including_data_inputs_submit_icon.style.backgroundColor = 'rgb(0, 255, 0)';
     setTimeout(() => {
@@ -727,10 +739,9 @@ createAllPackageIncludingAndNotIncludingData = function () {
     insertedPackageGiftDataDiv.id = 'inserted_package_icluding_gift_data_div';
     insertedPackageGiftDataDiv.className = 'inserted_package_including_and_not_icluding_data_div_class';
 
-    if (packageTotlaPriceInput !== '') {
+    if (packageTotlaPriceInput !== '' && packageTotlaPriceInput !== '-') {
         let _showPriceChecked = document.getElementById('show_package_total_price_checkbox').checked;
         document.getElementById('downloaded_pdf_total_price_data_page').style.display = _showPriceChecked ? 'block' : 'none';
-        document.getElementById('package_total_price_p_id').innerText = packageTotlaPriceInput;
         document.getElementById('store_google_sheet_package_total_price_value').innerText = packageTotlaPriceInput;
     } else {
         document.getElementById('downloaded_pdf_total_price_data_page').style.display = 'none';
@@ -1961,6 +1972,7 @@ createHotelsDataFunction = function () {
     let hotelArabicRoomTypeDescriptionInput = document.getElementById('hotel_arabic_room_type_description_input_id').value;
     let hotelUnitAmountInput = document.getElementById('hotel_unit_amount_input_id').value;
     let hotelBreakfastPeopleAmountInput = document.getElementById('hotel_breakfast_people_amount_input_id').value;
+    let hotelSafeSidePrice = document.getElementById('hotel_safe_side_price_input_id').value.replace(/,/g, '');
     let hotelExtraBedInput = document.getElementById('hotel_extra_bed_input_id').value;
     let hotelSpecialRoomRequestInput = document.getElementById('hotel_special_room_request_input_id').value;
     let hotelRoomExtraInfoReadyText = document.getElementById('hotel_room_extra_info_textarea_id').value;
@@ -1970,6 +1982,7 @@ createHotelsDataFunction = function () {
     let hotelArabicRoomTypeDescriptionInput_2 = document.getElementById('hotel_arabic_room_type_description_input_id_2').value;
     let hotelUnitAmountInput_2 = document.getElementById('hotel_unit_amount_input_id_2').value;
     let hotelBreakfastPeopleAmountInput_2 = document.getElementById('hotel_breakfast_people_amount_input_id_2').value;
+    let hotelSafeSidePrice_2 = document.getElementById('hotel_safe_side_price_input_id_2').value.replace(/,/g, '');
     let hotelExtraBedInput_2 = document.getElementById('hotel_extra_bed_input_id_2').value;
     let hotelSpecialRoomRequestInput_2 = document.getElementById('hotel_special_room_request_input_id_2').value;
     let hotelRoomExtraInfoReadyText_2 = document.getElementById('hotel_room_extra_info_textarea_id_2').value;
@@ -2134,6 +2147,8 @@ createHotelsDataFunction = function () {
         let hotelRowTableDiv = document.createElement('div');
         hotelRowTableDiv.id = `hotel_row_id_${insertedHotelDataDivUniqueId}`; // Set a unique ID for the hotel row div
         hotelRowTableDiv.className = 'hotel_row_class hotel_row_class_for_editing new_hotel_data_by_user_writing_class'; // Add a class to the div for styling
+        if (hotelSafeSidePrice) hotelRowTableDiv.dataset.safeSidePrice = hotelSafeSidePrice;
+        if (hotelSafeSidePrice_2 && document.getElementById('hotel_second_room_data_input_div').style.display !== 'none') hotelRowTableDiv.dataset.safeSidePrice2 = hotelSafeSidePrice_2;
 
         // Insert the HTML content into the newly created div
         hotelRowTableDiv.innerHTML = hotelRowTableDivContent;
@@ -2394,6 +2409,8 @@ createHotelsDataFunction = function () {
         let hotelRowTableDiv = document.createElement('div');
         hotelRowTableDiv.id = `hotel_row_id_${insertedHotelDataDivUniqueId}`; // Set a unique ID for the hotel row div
         hotelRowTableDiv.className = 'hotel_row_class hotel_row_class_for_editing'; // Add a class to the div for styling
+        if (hotelSafeSidePrice) hotelRowTableDiv.dataset.safeSidePrice = hotelSafeSidePrice;
+        if (hotelSafeSidePrice_2 && document.getElementById('hotel_second_room_data_input_div').style.display !== 'none') hotelRowTableDiv.dataset.safeSidePrice2 = hotelSafeSidePrice_2;
 
         // Insert the HTML content into the newly created div
         hotelRowTableDiv.innerHTML = hotelRowTableDivContent;
@@ -2584,12 +2601,14 @@ createHotelsDataFunction = function () {
     document.getElementById('hotel_total_nights_input_id').value = '';
     document.getElementById('hotel_arabic_room_type_description_input_id').value = '';
     document.getElementById('hotel_english_room_type_description_input_id').value = '';
+    document.getElementById('hotel_safe_side_price_input_id').value = '';
     document.getElementById('hotel_special_room_request_input_id').value = '';
     document.getElementById('hotel_room_extra_info_textarea_id').value = '';
 
 
     document.getElementById('hotel_arabic_room_type_description_input_id_2').value = '';
     document.getElementById('hotel_english_room_type_description_input_id_2').value = '';
+    document.getElementById('hotel_safe_side_price_input_id_2').value = '';
     document.getElementById('hotel_special_room_request_input_id_2').value = '';
     document.getElementById('hotel_room_extra_info_textarea_id_2').value = '';
 
@@ -3509,6 +3528,10 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
     document.getElementById('hotel_english_room_type_description_input_id').value = hotelRoomTypeDescriptionText;
     document.getElementById('hotel_unit_amount_input_id').value = `عدد الوحدات ${storeHotelTotalUnitNumber}`;
     document.getElementById('hotel_breakfast_people_amount_input_id').value = hotelBreakfastPeopleAmountText;
+    const _safeSideRaw = parseInt(clickedHotelDataDiv.dataset.safeSidePrice || '') || 0;
+    document.getElementById('hotel_safe_side_price_input_id').value = _safeSideRaw > 0 ? Number(_safeSideRaw).toLocaleString('en-US') : '';
+    const _safeSideRaw2 = parseInt(clickedHotelDataDiv.dataset.safeSidePrice2 || '') || 0;
+    document.getElementById('hotel_safe_side_price_input_id_2').value = _safeSideRaw2 > 0 ? Number(_safeSideRaw2).toLocaleString('en-US') : '';
     document.getElementById('hotel_extra_bed_input_id').value = hotelExtraBedText;
     document.getElementById('hotel_special_room_request_input_id').value = hotelSpecialRoomRequestText;
 
@@ -3709,6 +3732,7 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
         let hotelRoomTypeDescriptionInput = document.getElementById('hotel_english_room_type_description_input_id').value;
         let hotelArabicRoomTypeDescriptionInput = document.getElementById('hotel_arabic_room_type_description_input_id').value;
         let hotelBreakfastPeopleAmountInput = document.getElementById('hotel_breakfast_people_amount_input_id').value;
+        let hotelSafeSidePrice = document.getElementById('hotel_safe_side_price_input_id').value.replace(/,/g, '');
         let hotelExtraBedInput = document.getElementById('hotel_extra_bed_input_id').value;
         let hotelSpecialRoomRequestInput = document.getElementById('hotel_special_room_request_input_id').value;
         let hotelRoomExtraInfoReadyText = document.getElementById('hotel_room_extra_info_textarea_id').value;
@@ -3719,6 +3743,7 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
         let hotelArabicRoomTypeDescriptionInput_2 = document.getElementById('hotel_arabic_room_type_description_input_id_2').value;
         let hotelUnitAmountInput_2 = document.getElementById('hotel_unit_amount_input_id_2').value;
         let hotelBreakfastPeopleAmountInput_2 = document.getElementById('hotel_breakfast_people_amount_input_id_2').value;
+        let hotelSafeSidePrice_2 = document.getElementById('hotel_safe_side_price_input_id_2').value.replace(/,/g, '');
         let hotelExtraBedInput_2 = document.getElementById('hotel_extra_bed_input_id_2').value;
         let hotelSpecialRoomRequestInput_2 = document.getElementById('hotel_special_room_request_input_id_2').value;
         let hotelRoomExtraInfoReadyText_2 = document.getElementById('hotel_room_extra_info_textarea_id_2').value;
@@ -3856,6 +3881,8 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
 
             // Insert the new HTML content into the clicked hotel data div
             clickedHotelDataDiv.innerHTML = hotelRowTableDivContent;
+            if (hotelSafeSidePrice) clickedHotelDataDiv.dataset.safeSidePrice = hotelSafeSidePrice;
+            if (hotelSafeSidePrice_2 && document.getElementById('hotel_second_room_data_input_div').style.display !== 'none') clickedHotelDataDiv.dataset.safeSidePrice2 = hotelSafeSidePrice_2;
 
 
             // Append <span> elements for each input with text
@@ -4044,6 +4071,8 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
 
             // Insert the new HTML content into the clicked hotel data div
             clickedHotelDataDiv.innerHTML = hotelRowTableDivContent;
+            if (hotelSafeSidePrice) clickedHotelDataDiv.dataset.safeSidePrice = hotelSafeSidePrice;
+            if (hotelSafeSidePrice_2 && document.getElementById('hotel_second_room_data_input_div').style.display !== 'none') clickedHotelDataDiv.dataset.safeSidePrice2 = hotelSafeSidePrice_2;
 
 
             // Append <span> elements for each input with text
@@ -4748,9 +4777,19 @@ duplicateClickedHotelDataFunctio = function () {
     // Clone the original div
     let clonedDiv = originalDiv.cloneNode(true);
 
-    // Generate a unique ID for the new cloned div
-    let newDivId = currentHotelDataDivId + "_copy_" + new Date().getTime();
-    clonedDiv.id = newDivId;
+    /* Generate a fresh unique ID and rewrite the clone's id + every descendant id so the
+       duplicated row's children carry its own unique id. This keeps ids globally unique and
+       lets editClickedHotelDataFunction (which derives the uid from the row id) read them. */
+    let oldUid = currentHotelDataDivId.split('_').pop();
+    let newUid = `${new Date().getTime()}${Math.floor(Math.random() * 1000)}`;
+    let oldSuffix = `_${oldUid}`;
+
+    clonedDiv.id = `hotel_row_id_${newUid}`;
+    clonedDiv.querySelectorAll('[id]').forEach(el => {
+        if (el.id.endsWith(oldSuffix)) {
+            el.id = el.id.slice(0, -oldSuffix.length) + `_${newUid}`;
+        }
+    });
 
     // Insert the cloned div right after the original div
     originalDiv.parentNode.insertBefore(clonedDiv, originalDiv.nextSibling);

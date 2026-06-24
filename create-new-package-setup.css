@@ -2400,10 +2400,10 @@ input {
 
 .show_price_toggle_thumb {
     display: block;
-    width: 4.4vw;
-    height: 2.2vw;
+    width: clamp(54px, 4.4vw, 72px);
+    height: clamp(28px, 2.2vw, 36px);
     background: #ccc;
-    border-radius: 2.2vw;
+    border-radius: clamp(28px, 2.2vw, 36px);
     cursor: pointer;
     position: relative;
     transition: background 0.3s;
@@ -2412,10 +2412,10 @@ input {
 .show_price_toggle_thumb::after {
     content: '';
     position: absolute;
-    top: 0.22vw;
-    left: 0.22vw;
-    width: 1.76vw;
-    height: 1.76vw;
+    top: clamp(3px, 0.22vw, 4px);
+    left: clamp(3px, 0.22vw, 4px);
+    width: clamp(22px, 1.76vw, 28px);
+    height: clamp(22px, 1.76vw, 28px);
     background: white;
     border-radius: 50%;
     transition: transform 0.3s;
@@ -2427,5 +2427,5 @@ input {
 }
 
 .show_price_toggle_wrap input[type="checkbox"]:checked + .show_price_toggle_thumb::after {
-    transform: translateX(2.2vw);
+    transform: translateX(clamp(26px, 2.2vw, 36px));
 }

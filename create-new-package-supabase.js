@@ -566,7 +566,11 @@ async function importContentForSelectedName(name) {
         });
 
         // Show the company name image position
-        document.getElementById('inserted_company_name_image_position_div').style.display = 'flex';
+        const companyNameImageDiv = document.getElementById('inserted_company_name_image_position_div');
+        if (companyNameImageDiv) companyNameImageDiv.style.display = 'flex';
+
+        // Rebuild the price table from the imported hotel cards
+        if (typeof buildPriceTable === 'function') buildPriceTable();
 
 
 
@@ -1374,7 +1378,6 @@ reActiveDragAndDropFunctionality = function (visiableDivIdName) {
         document.getElementById('sms_card_with_internet_amount_input_id').value = document.getElementById('store_google_sheet_package_including_sms_value').innerText;
         document.getElementById('inner_flight_tickets_amount_input_id').value = document.getElementById('store_google_sheet_package_including_inner_tickets_value').innerText;
         document.getElementById('package_details_textarea_id').value = document.getElementById('store_google_sheet_package_details_textarea_value').innerText.replace(/\\n/g, '\n');
-        document.getElementById('package_totla_price_input_id').value = document.getElementById('store_google_sheet_package_total_price_value').innerText;
 
 
 

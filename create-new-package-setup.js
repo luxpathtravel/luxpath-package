@@ -1141,7 +1141,7 @@ let initialColors = {
     'inner_flight_tickets_checkbox': 'rgb(0, 255, 0)', // Green
     'customer_service_24_hour_checkbox': 'rgb(0, 255, 0)', // Green
     'sms_card_with_internet_checkbox': 'rgb(0, 255, 0)', // Green
-    'welcome_with_flowers_checkbox': 'rgb(255, 255, 255)', // White
+    'welcome_with_flowers_checkbox': 'rgb(0, 255, 0)', // Green
     'special_oud_checkbox': 'rgb(255, 255, 255)', // White
     'outer_flight_tickets_checkbox': 'rgb(255, 0, 0)', // Red
     'placese_visiting_cost_checkbox': 'rgb(255, 0, 0)', // Red
@@ -1330,7 +1330,7 @@ changeInsertHotelDataSystem = function () {
         document.getElementById('hotel_english_room_type_description_input_id').onclick = function () {
             createArabicRoomTypeDescripyionDropDown(); showOverlay('hotel_arabic_room_type_description_dropdown');
         };
-        document.getElementById('hhotel_english_room_type_description_input_id_2').style.cursor = 'pointer';
+        document.getElementById('hotel_english_room_type_description_input_id_2').style.cursor = 'pointer';
         document.getElementById('hotel_english_room_type_description_input_id_2').onclick = function () {
             createArabicRoomTypeDescripyionDropDown(); showOverlay('hotel_arabic_room_type_description_dropdown');
         };

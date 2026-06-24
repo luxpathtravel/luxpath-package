@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="create-new-package-insert-data.css" />
     <link rel="stylesheet" href="create-new-package-setup.css" />
     <link rel="stylesheet" href="thank-you-page.css" />
+    <link rel="stylesheet" href="package-price.css" />
 
 
     <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48" />
@@ -558,6 +559,8 @@
                             readonly autocomplete="off" onclick="showOverlay('breakfast_amount_dropdown')"
                             style="cursor: pointer;">
 
+                        <input type="text" id="hotel_safe_side_price_input_id" placeholder="الإجمالي مع السيف سايد"
+                            autocomplete="off" oninput="formatPriceInput(this)">
 
                         <input type="text" id="hotel_extra_bed_input_id" placeholder="سرير إضافي؟" readonly
                             autocomplete="off" onclick="showOverlay('hotel_extra_bed_dropdown')"
@@ -574,7 +577,8 @@
                             placeholder="معلومات اكثر؟" autocomplete="off"></textarea>
                         <ion-icon name="scan" class="textarea_open_fullscreen_icon_class"
                             onclick="playSoundEffect('click'); toggleFullscreen('hotel_room_extra_info_textarea_id')"></ion-icon>
-                        <input type="text" id="hotel_booking_url_input_id" placeholder="رابط بوكينج" autocomplete="off" style="display: none;">
+                        <input type="text" id="hotel_booking_url_input_id" placeholder="رابط بوكينج" autocomplete="off"
+                            style="display: none;">
                     </div>
 
                     <!-- Second hotel room data inputs div -->
@@ -602,6 +606,8 @@
                             readonly autocomplete="off" onclick="showOverlay('breakfast_amount_dropdown')"
                             style="cursor: pointer;">
 
+                        <input type="text" id="hotel_safe_side_price_input_id_2" placeholder="الإجمالي مع السيف سايد"
+                            autocomplete="off" oninput="formatPriceInput(this)">
 
                         <input type="text" id="hotel_extra_bed_input_id_2" placeholder="سرير إضافي؟" readonly
                             autocomplete="off" onclick="showOverlay('hotel_extra_bed_dropdown')"
@@ -990,7 +996,8 @@
                     </div>
 
                     <div class="package_including_data_custom_checkbox">
-                        <input type="checkbox" id="welcome_with_flowers_checkbox" onclick="playSoundEffect('click')">
+                        <input type="checkbox" id="welcome_with_flowers_checkbox" onclick="playSoundEffect('click')"
+                            checked>
                         <label for="welcome_with_flowers_checkbox">إستقبال ورد</label>
                     </div>
 
@@ -1043,16 +1050,16 @@
                     onclick="playSoundEffect('click'); toggleFullscreen('package_details_textarea_id')"></ion-icon>
 
 
-                <input type="text" id="package_totla_price_input_id" class="dynamic_direction_input_class"
-                    placeholder="إجمالي السعر" autocomplete="off"
-                    oninput="formatPriceInput(this)">
+                <!-- Package price breakdown table -->
+                <div id="package_price_table_div"></div>
 
 
 
-                                <div class="package_including_details_div_class">
+                <div class="package_including_details_div_class">
                     <div class="show_package_total_price_checkbox_div">
                         <span class="show_price_icon_span">💰</span>
-                        <label for="show_package_total_price_checkbox" class="show_price_text_label">إظهار السعر في الملف؟</label>
+                        <label for="show_package_total_price_checkbox" class="show_price_text_label">إظهار السعر في
+                            الملف؟</label>
                         <div class="show_price_toggle_wrap">
                             <input type="checkbox" id="show_package_total_price_checkbox" checked
                                 onclick="playSoundEffect('click'); togglePriceDisplayInPDF()">
@@ -1254,7 +1261,8 @@
                         onclick="playSoundEffect('success'); hideAndShowFlightSectionFunction()"></ion-icon>
                 </div>
 
-
+                <input type="text" id="domestic_flight_price_input_id" placeholder="سعر الطيران الداخلي"
+                    autocomplete="off" oninput="formatPriceInput(this); updateDomesticFlightPrice()" style="margin-top: 15px;">
 
 
                 <div class="edit_data_controll_icons_div">
@@ -1860,8 +1868,7 @@
             <div id="pdf_page1_arch_outer_border">
                 <div id="pdf_page1_arch_inner_frame">
                     <img src="" id="welcome_pdf_first_page_image_id"
-                        class="inserted_package_data_section_page_image_class"
-                        style="padding: 0 !important;">
+                        class="inserted_package_data_section_page_image_class" style="padding: 0 !important;">
                 </div>
             </div>
         </div>
@@ -1919,101 +1926,103 @@
         <div id="pdf_page1_skyline_div">
             <svg viewBox="0 0 1000 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <!-- Gold water/base band -->
-                <rect x="0" y="82" width="1000" height="48" fill="#C9A84C"/>
+                <rect x="0" y="82" width="1000" height="48" fill="#C9A84C" />
                 <!-- Subtle water ripples -->
-                <path d="M0,91 Q125,87 250,91 Q375,95 500,91 Q625,87 750,91 Q875,95 1000,91" stroke="#1C3D2E" stroke-width="1.5" fill="none" opacity="0.25"/>
-                <path d="M0,103 Q100,99 200,103 Q300,107 400,103 Q500,99 600,103 Q700,107 800,103 Q900,99 1000,103" stroke="#1C3D2E" stroke-width="1.5" fill="none" opacity="0.2"/>
+                <path d="M0,91 Q125,87 250,91 Q375,95 500,91 Q625,87 750,91 Q875,95 1000,91" stroke="#1C3D2E"
+                    stroke-width="1.5" fill="none" opacity="0.25" />
+                <path d="M0,103 Q100,99 200,103 Q300,107 400,103 Q500,99 600,103 Q700,107 800,103 Q900,99 1000,103"
+                    stroke="#1C3D2E" stroke-width="1.5" fill="none" opacity="0.2" />
                 <!-- Ground strip -->
-                <rect x="0" y="116" width="1000" height="14" fill="#1C3D2E"/>
+                <rect x="0" y="116" width="1000" height="14" fill="#1C3D2E" />
                 <g fill="#1C3D2E">
                     <!-- Left palm 1 (leaning left) -->
-                    <rect x="26" y="50" width="7" height="70" transform="rotate(-8 29 130)"/>
-                    <ellipse cx="29" cy="48" rx="28" ry="7" transform="rotate(-60 29 48)"/>
-                    <ellipse cx="29" cy="48" rx="25" ry="6" transform="rotate(-15 29 48)"/>
-                    <ellipse cx="29" cy="48" rx="24" ry="6" transform="rotate(25 29 48)"/>
-                    <ellipse cx="29" cy="48" rx="20" ry="5" transform="rotate(60 29 48)"/>
-                    <ellipse cx="29" cy="48" rx="18" ry="4" transform="rotate(-92 29 48)"/>
+                    <rect x="26" y="50" width="7" height="70" transform="rotate(-8 29 130)" />
+                    <ellipse cx="29" cy="48" rx="28" ry="7" transform="rotate(-60 29 48)" />
+                    <ellipse cx="29" cy="48" rx="25" ry="6" transform="rotate(-15 29 48)" />
+                    <ellipse cx="29" cy="48" rx="24" ry="6" transform="rotate(25 29 48)" />
+                    <ellipse cx="29" cy="48" rx="20" ry="5" transform="rotate(60 29 48)" />
+                    <ellipse cx="29" cy="48" rx="18" ry="4" transform="rotate(-92 29 48)" />
                     <!-- Left palm 2 (leaning right) -->
-                    <rect x="68" y="52" width="7" height="68" transform="rotate(7 71 130)"/>
-                    <ellipse cx="71" cy="50" rx="27" ry="7" transform="rotate(62 71 50)"/>
-                    <ellipse cx="71" cy="50" rx="24" ry="6" transform="rotate(22 71 50)"/>
-                    <ellipse cx="71" cy="50" rx="23" ry="6" transform="rotate(-18 71 50)"/>
-                    <ellipse cx="71" cy="50" rx="19" ry="5" transform="rotate(-55 71 50)"/>
-                    <ellipse cx="71" cy="50" rx="17" ry="4" transform="rotate(92 71 50)"/>
+                    <rect x="68" y="52" width="7" height="68" transform="rotate(7 71 130)" />
+                    <ellipse cx="71" cy="50" rx="27" ry="7" transform="rotate(62 71 50)" />
+                    <ellipse cx="71" cy="50" rx="24" ry="6" transform="rotate(22 71 50)" />
+                    <ellipse cx="71" cy="50" rx="23" ry="6" transform="rotate(-18 71 50)" />
+                    <ellipse cx="71" cy="50" rx="19" ry="5" transform="rotate(-55 71 50)" />
+                    <ellipse cx="71" cy="50" rx="17" ry="4" transform="rotate(92 71 50)" />
                     <!-- Left small meru (3 tiers, center x=148) -->
-                    <polygon points="148,30 144,40 152,40"/>
-                    <rect x="141" y="39" width="14" height="9"/>
-                    <rect x="133" y="47" width="30" height="4"/>
-                    <rect x="136" y="50" width="24" height="10"/>
-                    <rect x="125" y="59" width="46" height="5"/>
-                    <rect x="129" y="63" width="38" height="10"/>
-                    <rect x="113" y="72" width="70" height="6"/>
-                    <rect x="118" y="77" width="60" height="53"/>
-                    <rect x="140" y="96" width="16" height="34" fill="#C9A84C"/>
+                    <polygon points="148,30 144,40 152,40" />
+                    <rect x="141" y="39" width="14" height="9" />
+                    <rect x="133" y="47" width="30" height="4" />
+                    <rect x="136" y="50" width="24" height="10" />
+                    <rect x="125" y="59" width="46" height="5" />
+                    <rect x="129" y="63" width="38" height="10" />
+                    <rect x="113" y="72" width="70" height="6" />
+                    <rect x="118" y="77" width="60" height="53" />
+                    <rect x="140" y="96" width="16" height="34" fill="#C9A84C" />
                     <!-- Left candi bentar left half (inner face x=246) -->
-                    <polygon points="224,22 217,33 246,33"/>
-                    <rect x="212" y="32" width="34" height="13"/>
-                    <rect x="206" y="44" width="40" height="13"/>
-                    <rect x="200" y="56" width="46" height="12"/>
-                    <rect x="196" y="67" width="50" height="63"/>
+                    <polygon points="224,22 217,33 246,33" />
+                    <rect x="212" y="32" width="34" height="13" />
+                    <rect x="206" y="44" width="40" height="13" />
+                    <rect x="200" y="56" width="46" height="12" />
+                    <rect x="196" y="67" width="50" height="63" />
                     <!-- Left candi bentar right half (inner face x=264) -->
-                    <polygon points="286,22 264,33 293,33"/>
-                    <rect x="264" y="32" width="34" height="13"/>
-                    <rect x="264" y="44" width="40" height="13"/>
-                    <rect x="264" y="56" width="46" height="12"/>
-                    <rect x="264" y="67" width="50" height="63"/>
+                    <polygon points="286,22 264,33 293,33" />
+                    <rect x="264" y="32" width="34" height="13" />
+                    <rect x="264" y="44" width="40" height="13" />
+                    <rect x="264" y="56" width="46" height="12" />
+                    <rect x="264" y="67" width="50" height="63" />
                     <!-- Central grand meru (6 tiers, center x=500) -->
-                    <polygon points="500,2 496,16 504,16"/>
-                    <rect x="490" y="15" width="20" height="9"/>
-                    <rect x="478" y="23" width="44" height="5"/>
-                    <rect x="484" y="27" width="32" height="9"/>
-                    <rect x="466" y="35" width="68" height="6"/>
-                    <rect x="474" y="40" width="52" height="11"/>
-                    <rect x="451" y="50" width="98" height="6"/>
-                    <rect x="461" y="55" width="78" height="11"/>
-                    <rect x="434" y="65" width="132" height="6"/>
-                    <rect x="447" y="70" width="106" height="10"/>
-                    <rect x="414" y="79" width="172" height="5"/>
-                    <rect x="390" y="83" width="220" height="47"/>
-                    <rect x="487" y="100" width="26" height="30" fill="#C9A84C"/>
-                    <rect x="402" y="104" width="18" height="12" fill="#C9A84C"/>
-                    <rect x="580" y="104" width="18" height="12" fill="#C9A84C"/>
+                    <polygon points="500,2 496,16 504,16" />
+                    <rect x="490" y="15" width="20" height="9" />
+                    <rect x="478" y="23" width="44" height="5" />
+                    <rect x="484" y="27" width="32" height="9" />
+                    <rect x="466" y="35" width="68" height="6" />
+                    <rect x="474" y="40" width="52" height="11" />
+                    <rect x="451" y="50" width="98" height="6" />
+                    <rect x="461" y="55" width="78" height="11" />
+                    <rect x="434" y="65" width="132" height="6" />
+                    <rect x="447" y="70" width="106" height="10" />
+                    <rect x="414" y="79" width="172" height="5" />
+                    <rect x="390" y="83" width="220" height="47" />
+                    <rect x="487" y="100" width="26" height="30" fill="#C9A84C" />
+                    <rect x="402" y="104" width="18" height="12" fill="#C9A84C" />
+                    <rect x="580" y="104" width="18" height="12" fill="#C9A84C" />
                     <!-- Right candi bentar left half (inner face x=736) -->
-                    <polygon points="714,22 706,33 736,33"/>
-                    <rect x="702" y="32" width="34" height="13"/>
-                    <rect x="696" y="44" width="40" height="13"/>
-                    <rect x="690" y="56" width="46" height="12"/>
-                    <rect x="686" y="67" width="50" height="63"/>
+                    <polygon points="714,22 706,33 736,33" />
+                    <rect x="702" y="32" width="34" height="13" />
+                    <rect x="696" y="44" width="40" height="13" />
+                    <rect x="690" y="56" width="46" height="12" />
+                    <rect x="686" y="67" width="50" height="63" />
                     <!-- Right candi bentar right half (inner face x=754) -->
-                    <polygon points="776,22 754,33 783,33"/>
-                    <rect x="754" y="32" width="34" height="13"/>
-                    <rect x="754" y="44" width="40" height="13"/>
-                    <rect x="754" y="56" width="46" height="12"/>
-                    <rect x="754" y="67" width="50" height="63"/>
+                    <polygon points="776,22 754,33 783,33" />
+                    <rect x="754" y="32" width="34" height="13" />
+                    <rect x="754" y="44" width="40" height="13" />
+                    <rect x="754" y="56" width="46" height="12" />
+                    <rect x="754" y="67" width="50" height="63" />
                     <!-- Right small meru (3 tiers, center x=852) -->
-                    <polygon points="852,30 848,40 856,40"/>
-                    <rect x="845" y="39" width="14" height="9"/>
-                    <rect x="837" y="47" width="30" height="4"/>
-                    <rect x="840" y="50" width="24" height="10"/>
-                    <rect x="829" y="59" width="46" height="5"/>
-                    <rect x="833" y="63" width="38" height="10"/>
-                    <rect x="817" y="72" width="70" height="6"/>
-                    <rect x="822" y="77" width="60" height="53"/>
-                    <rect x="844" y="96" width="16" height="34" fill="#C9A84C"/>
+                    <polygon points="852,30 848,40 856,40" />
+                    <rect x="845" y="39" width="14" height="9" />
+                    <rect x="837" y="47" width="30" height="4" />
+                    <rect x="840" y="50" width="24" height="10" />
+                    <rect x="829" y="59" width="46" height="5" />
+                    <rect x="833" y="63" width="38" height="10" />
+                    <rect x="817" y="72" width="70" height="6" />
+                    <rect x="822" y="77" width="60" height="53" />
+                    <rect x="844" y="96" width="16" height="34" fill="#C9A84C" />
                     <!-- Right palm 1 (leaning left) -->
-                    <rect x="922" y="50" width="7" height="70" transform="rotate(-7 925 130)"/>
-                    <ellipse cx="925" cy="48" rx="27" ry="7" transform="rotate(-62 925 48)"/>
-                    <ellipse cx="925" cy="48" rx="24" ry="6" transform="rotate(-22 925 48)"/>
-                    <ellipse cx="925" cy="48" rx="23" ry="6" transform="rotate(18 925 48)"/>
-                    <ellipse cx="925" cy="48" rx="19" ry="5" transform="rotate(55 925 48)"/>
-                    <ellipse cx="925" cy="48" rx="17" ry="4" transform="rotate(-92 925 48)"/>
+                    <rect x="922" y="50" width="7" height="70" transform="rotate(-7 925 130)" />
+                    <ellipse cx="925" cy="48" rx="27" ry="7" transform="rotate(-62 925 48)" />
+                    <ellipse cx="925" cy="48" rx="24" ry="6" transform="rotate(-22 925 48)" />
+                    <ellipse cx="925" cy="48" rx="23" ry="6" transform="rotate(18 925 48)" />
+                    <ellipse cx="925" cy="48" rx="19" ry="5" transform="rotate(55 925 48)" />
+                    <ellipse cx="925" cy="48" rx="17" ry="4" transform="rotate(-92 925 48)" />
                     <!-- Right palm 2 (leaning right) -->
-                    <rect x="962" y="52" width="7" height="68" transform="rotate(8 965 130)"/>
-                    <ellipse cx="965" cy="50" rx="28" ry="7" transform="rotate(60 965 50)"/>
-                    <ellipse cx="965" cy="50" rx="25" ry="6" transform="rotate(15 965 50)"/>
-                    <ellipse cx="965" cy="50" rx="24" ry="6" transform="rotate(-25 965 50)"/>
-                    <ellipse cx="965" cy="50" rx="20" ry="5" transform="rotate(-60 965 50)"/>
-                    <ellipse cx="965" cy="50" rx="18" ry="4" transform="rotate(92 965 50)"/>
+                    <rect x="962" y="52" width="7" height="68" transform="rotate(8 965 130)" />
+                    <ellipse cx="965" cy="50" rx="28" ry="7" transform="rotate(60 965 50)" />
+                    <ellipse cx="965" cy="50" rx="25" ry="6" transform="rotate(15 965 50)" />
+                    <ellipse cx="965" cy="50" rx="24" ry="6" transform="rotate(-25 965 50)" />
+                    <ellipse cx="965" cy="50" rx="20" ry="5" transform="rotate(-60 965 50)" />
+                    <ellipse cx="965" cy="50" rx="18" ry="4" transform="rotate(92 965 50)" />
                 </g>
             </svg>
         </div>
@@ -2071,7 +2080,8 @@
                 <span class="pdf_flight_subtitle_line_span"></span>
                 <p id="pdf_flight_page_subtitle_p" dir="rtl">إرشادات هامة عن الطيران</p>
                 <span class="pdf_flight_subtitle_line_span"></span>
-                <span class="pdf_flight_subtitle_arrow_span" style="display: inline-block; transform: scaleX(-1);">►</span>
+                <span class="pdf_flight_subtitle_arrow_span"
+                    style="display: inline-block; transform: scaleX(-1);">►</span>
             </div>
         </div>
 
@@ -2079,21 +2089,31 @@
         <div id="pdf_flight_content_row_div">
 
             <div id="pdf_flight_image_col_div">
-                <img src="flight-window-image.jpg"
-                     id="pdf_flight_hero_img_id"
-                     width="1080" height="1350"
-                     style="padding: 0 !important;">
+                <img src="flight-window-image.jpg" id="pdf_flight_hero_img_id" width="1080" height="1350"
+                    style="padding: 0 !important;">
             </div>
 
-            
+
             <div id="pdf_flight_table_col_div">
                 <div class="flight_row_class inserted_main_row_color_class smaller_main_flight_row_text_size_class">
-                    <div><p>الخطوط</p></div>
-                    <div><p>عدد الأشخاص</p></div>
-                    <div><p>الوزن المسموح</p></div>
-                    <div><p>من</p></div>
-                    <div><p>الى</p></div>
-                    <div><p>تاريخ السفر</p></div>
+                    <div>
+                        <p>الخطوط</p>
+                    </div>
+                    <div>
+                        <p>عدد الأشخاص</p>
+                    </div>
+                    <div>
+                        <p>الوزن المسموح</p>
+                    </div>
+                    <div>
+                        <p>من</p>
+                    </div>
+                    <div>
+                        <p>الى</p>
+                    </div>
+                    <div>
+                        <p>تاريخ السفر</p>
+                    </div>
                 </div>
                 <div id="inserted_flight_data_position_div"></div>
             </div>
@@ -2107,21 +2127,24 @@
                 <div class="pdf_flight_note_icon_wrapper_div">
                     <ion-icon name="ticket"></ion-icon>
                 </div>
-                <p class="pdf_flight_note_text_p">تذاكر الطيران الداخلي بعد تأكيد البرنامج تصبح غير قابلة للإسترجاع لذلك نرتبها لك بكل عناية من البداية.</p>
+                <p class="pdf_flight_note_text_p">تذاكر الطيران الداخلي بعد تأكيد البرنامج تصبح غير قابلة للإسترجاع لذلك
+                    نرتبها لك بكل عناية من البداية.</p>
             </div>
 
             <div class="pdf_flight_note_card_class">
                 <div class="pdf_flight_note_icon_wrapper_div">
                     <ion-icon name="cube"></ion-icon>
                 </div>
-                <p class="pdf_flight_note_text_p">الوزن المسموح 20 كيلو لكل راكب فوق سنتين، لإضافة وزن إضافي يرجى إبلاغنا قبل الرحلة بيومين، وتطبق رسوم إضافية على الوزن الزائد.</p>
+                <p class="pdf_flight_note_text_p">الوزن المسموح 20 كيلو لكل راكب فوق سنتين، لإضافة وزن إضافي يرجى
+                    إبلاغنا قبل الرحلة بيومين، وتطبق رسوم إضافية على الوزن الزائد.</p>
             </div>
 
             <div class="pdf_flight_note_card_class">
                 <div class="pdf_flight_note_icon_wrapper_div">
                     <ion-icon name="time"></ion-icon>
                 </div>
-                <p class="pdf_flight_note_text_p">في حال حدوث تأخير في رحلتك أو في إجراءات السفر بالمطار، نرجو إبلاغنا لتحديث وقت وصولك.</p>
+                <p class="pdf_flight_note_text_p">في حال حدوث تأخير في رحلتك أو في إجراءات السفر بالمطار، نرجو إبلاغنا
+                    لتحديث وقت وصولك.</p>
             </div>
 
         </div>
@@ -2147,15 +2170,17 @@
         <div id="pdf_hotel_page_header_div" dir="rtl">
             <div id="pdf_hotel_page_title_row_div">
                 <div id="pdf_hotel_page_title_text_div">
-                    <h1 id="pdf_hotel_page_main_title_h1" dir="rtl">الفنادق / الفندق</h1>
+                    <h1 id="pdf_hotel_page_main_title_h1" dir="rtl">الفنادق / الفلل</h1>
                     <div id="pdf_hotel_page_subtitle_row_div">
                         <span class="pdf_hotel_subtitle_arrow_span">►</span>
                         <span class="pdf_hotel_subtitle_line_span"></span>
                         <p id="pdf_hotel_page_subtitle_p" dir="rtl">خيارات إقامة فاخرة لعطلتك المثالية</p>
                         <span class="pdf_hotel_subtitle_line_span"></span>
-                        <span class="pdf_hotel_subtitle_arrow_span" style="display:inline-block; transform:scaleX(-1);">►</span>
+                        <span class="pdf_hotel_subtitle_arrow_span"
+                            style="display:inline-block; transform:scaleX(-1);">►</span>
                     </div>
-                    <p id="hotel_links_guide_note_p_id" style="display: none;">اضغط على صورة الفندق/الفيلا لمعلومات اكثر عن السكن.</p>
+                    <p id="hotel_links_guide_note_p_id" style="display: none;">اضغط على صورة الفندق/الفيلا لمعلومات اكثر
+                        عن السكن.</p>
                 </div>
                 <div id="pdf_hotel_page_icon_badge_div">
                     <span id="pdf_hotel_page_icon_span">🛏️</span>
@@ -2166,13 +2191,27 @@
         <!-- TABLE WRAPPER -->
         <div id="pdf_hotel_table_wrapper_div">
             <div class="hotel_row_class inserted_main_row_color_class smaller_main_hotel_row_text_size_class">
-                <div><p class="selectable-text">اسم الفندق/<br>الفيلا</p></div>
-                <div><p class="selectable-text">تاريخ الدخول</p></div>
-                <div><p class="selectable-text">تاريخ الخروج</p></div>
-                <div><p class="selectable-text">عدد الليالي</p></div>
-                <div class="description_cell"><p class="selectable-text">الغرفة/<br>الفيلا</p></div>
-                <div><p class="selectable-text">عدد الوحدات</p></div>
-                <div><p class="selectable-text">المدينة/<br>التقييم</p></div>
+                <div>
+                    <p class="selectable-text">اسم الفندق/<br>الفيلا</p>
+                </div>
+                <div>
+                    <p class="selectable-text">تاريخ الدخول</p>
+                </div>
+                <div>
+                    <p class="selectable-text">تاريخ الخروج</p>
+                </div>
+                <div>
+                    <p class="selectable-text">عدد الليالي</p>
+                </div>
+                <div class="description_cell">
+                    <p class="selectable-text">الغرفة/<br>الفيلا</p>
+                </div>
+                <div>
+                    <p class="selectable-text">عدد الوحدات</p>
+                </div>
+                <div>
+                    <p class="selectable-text">المدينة/<br>التقييم</p>
+                </div>
             </div>
             <div id="inserted_hotel_data_position_div"></div>
         </div>
@@ -2281,7 +2320,8 @@
                         <span class="pdf_movements_subtitle_line_span"></span>
                         <p id="pdf_movements_page_subtitle_p" dir="rtl">يوم من كل يوم ← سيارة مع سائق والنزهة كاملة</p>
                         <span class="pdf_movements_subtitle_line_span"></span>
-                        <span class="pdf_movements_subtitle_arrow_span" style="display:inline-block; transform:scaleX(-1);">►</span>
+                        <span class="pdf_movements_subtitle_arrow_span"
+                            style="display:inline-block; transform:scaleX(-1);">►</span>
                     </div>
                 </div>
                 <div id="pdf_movements_page_icon_badge_div">
@@ -2293,9 +2333,15 @@
         <!-- TABLE WRAPPER -->
         <div id="pdf_movements_table_wrapper_div">
             <div class="clint_movements_row_class inserted_main_row_color_class">
-                <div><p>التاريخ</p></div>
-                <div><p>البرنامج والجولات المقترحة</p></div>
-                <div><p>المدينة</p></div>
+                <div>
+                    <p>التاريخ</p>
+                </div>
+                <div>
+                    <p>البرنامج والجولات المقترحة</p>
+                </div>
+                <div>
+                    <p>المدينة</p>
+                </div>
             </div>
             <div id="inserted_clint_movements_data_position_div"></div>
         </div>
@@ -2304,15 +2350,18 @@
         <div id="pdf_movements_notes_row_div">
             <div class="pdf_movements_note_card_class">
                 <div class="pdf_movements_note_icon_wrapper_div"><ion-icon name="time"></ion-icon></div>
-                <p class="pdf_movements_note_text_p">جولتك الخاصة لمدة 8 ساعات تبدأ من لحظة وصول السائق إلى فندقك، حسب الموعد المتفق عليه مسبقاً.</p>
+                <p class="pdf_movements_note_text_p">جولتك الخاصة لمدة 8 ساعات تبدأ من لحظة وصول السائق إلى فندقك، حسب
+                    الموعد المتفق عليه مسبقاً.</p>
             </div>
             <div class="pdf_movements_note_card_class">
                 <div class="pdf_movements_note_icon_wrapper_div"><ion-icon name="car"></ion-icon></div>
-                <p class="pdf_movements_note_text_p">يرجى إبلاغنا مسبقًا إذا كان حجم السيارة غير مناسب لعدد الركاب أو الأمتعة.</p>
+                <p class="pdf_movements_note_text_p">يرجى إبلاغنا مسبقًا إذا كان حجم السيارة غير مناسب لعدد الركاب أو
+                    الأمتعة.</p>
             </div>
             <div class="pdf_movements_note_card_class">
                 <div class="pdf_movements_note_icon_wrapper_div"><ion-icon name="map"></ion-icon></div>
-                <p class="pdf_movements_note_text_p">استمتع بزيارة أبرز المعالم والمناطق السياحية ضمن حدود إقامتك لتعيش تجربة على ذوقك.</p>
+                <p class="pdf_movements_note_text_p">استمتع بزيارة أبرز المعالم والمناطق السياحية ضمن حدود إقامتك لتعيش
+                    تجربة على ذوقك.</p>
             </div>
         </div>
 
@@ -2329,28 +2378,30 @@
 
     <section id="downloaded_pdf_important_notes_data_page" style="padding-top: 20px; display: none;">
 
-    <!-- PAGE HEADER -->
-    <div id="pdf_notes_page_header_div" dir="rtl">
-        <div id="pdf_notes_page_title_row_div">
-            <div id="pdf_notes_page_title_text_div">
-                <h1 id="pdf_notes_page_main_title_h1" dir="rtl">إرشادات وملاحظات مهمة</h1>
-                <div id="pdf_notes_page_subtitle_row_div">
-                    <span class="pdf_notes_subtitle_arrow_span">►</span>
-                    <span class="pdf_notes_subtitle_line_span"></span>
-                    <p id="pdf_notes_page_subtitle_p" dir="rtl">يُرجى قراءة هذه الإرشادات بعناية قبل السفر</p>
-                    <span class="pdf_notes_subtitle_line_span"></span>
-                    <span class="pdf_notes_subtitle_arrow_span" style="display:inline-block; transform:scaleX(-1);">►</span>
+        <!-- PAGE HEADER -->
+        <div id="pdf_notes_page_header_div" dir="rtl">
+            <div id="pdf_notes_page_title_row_div">
+                <div id="pdf_notes_page_title_text_div">
+                    <h1 id="pdf_notes_page_main_title_h1" dir="rtl">إرشادات وملاحظات مهمة</h1>
+                    <div id="pdf_notes_page_subtitle_row_div">
+                        <span class="pdf_notes_subtitle_arrow_span">►</span>
+                        <span class="pdf_notes_subtitle_line_span"></span>
+                        <p id="pdf_notes_page_subtitle_p" dir="rtl">يُرجى قراءة هذه الإرشادات بعناية قبل السفر</p>
+                        <span class="pdf_notes_subtitle_line_span"></span>
+                        <span class="pdf_notes_subtitle_arrow_span"
+                            style="display:inline-block; transform:scaleX(-1);">►</span>
+                    </div>
+                </div>
+                <div id="pdf_notes_page_icon_badge_div">
+                    <span id="pdf_notes_page_icon_span">📋</span>
                 </div>
             </div>
-            <div id="pdf_notes_page_icon_badge_div">
-                <span id="pdf_notes_page_icon_span">📋</span>
-            </div>
         </div>
-    </div>
 
 
 
-        <div id="pdf_section_title_div_usuful_notes_id" class="pdf_section_title_div_class hide_for_sky_global" style="display:none!important;">
+        <div id="pdf_section_title_div_usuful_notes_id" class="pdf_section_title_div_class hide_for_sky_global"
+            style="display:none!important;">
             <h6>إرشادات وتعليمات عامة</h6>
             <p style="transform: scaleX(-1);">📢</p>
         </div>
@@ -2483,52 +2534,57 @@
 
     <section id="downloaded_pdf_total_price_data_page" style="display: none;">
 
-    <!-- PAGE HEADER -->
-    <div id="pdf_price_page_header_div" dir="rtl">
-        <div id="pdf_price_page_title_row_div">
-            <div id="pdf_price_page_title_text_div">
-                <h1 id="pdf_price_page_main_title_h1" dir="rtl">ملخص التكاليف</h1>
-                <div id="pdf_price_page_subtitle_row_div">
-                    <span class="pdf_price_subtitle_arrow_span">►</span>
-                    <span class="pdf_price_subtitle_line_span"></span>
-                    <p id="pdf_price_page_subtitle_p" dir="rtl">الإجمالي الكلي للبرنامج السياحي</p>
-                    <span class="pdf_price_subtitle_line_span"></span>
-                    <span class="pdf_price_subtitle_arrow_span" style="display:inline-block; transform:scaleX(-1);">►</span>
+        <!-- PAGE HEADER -->
+        <div id="pdf_price_page_header_div" dir="rtl">
+            <div id="pdf_price_page_title_row_div">
+                <div id="pdf_price_page_title_text_div">
+                    <h1 id="pdf_price_page_main_title_h1" dir="rtl">ملخص التكاليف</h1>
+                    <div id="pdf_price_page_subtitle_row_div">
+                        <span class="pdf_price_subtitle_arrow_span">►</span>
+                        <span class="pdf_price_subtitle_line_span"></span>
+                        <p id="pdf_price_page_subtitle_p" dir="rtl">الإجمالي الكلي للبرنامج السياحي</p>
+                        <span class="pdf_price_subtitle_line_span"></span>
+                        <span class="pdf_price_subtitle_arrow_span"
+                            style="display:inline-block; transform:scaleX(-1);">►</span>
+                    </div>
+                </div>
+                <div id="pdf_price_page_icon_badge_div">
+                    <span id="pdf_price_page_icon_span">💰</span>
                 </div>
             </div>
-            <div id="pdf_price_page_icon_badge_div">
-                <span id="pdf_price_page_icon_span">💰</span>
+        </div>
+
+        <!-- Luxury price reveal card -->
+        <div id="pdf_price_reveal_card_div">
+            <div id="pdf_price_reveal_top_band_div">
+                <ion-icon name="cash-outline" id="pdf_price_band_icon"></ion-icon>
+                <p id="pdf_price_reveal_top_label_p">الإجمالي الكلي للبرنامج</p>
             </div>
+            <div id="package_total_price_div">
+                <h6 onclick="runDeleteThisPackageIncludingDataText('package_total_price_p_id')"
+                    style="cursor: pointer;">الإجمالي</h6>
+                <p id="package_total_price_p_id"
+                    onclick="runDeleteThisPackageIncludingDataText('package_total_price_p_id')"
+                    style="cursor: pointer;"></p>
+                <p id="pdf_price_currency_label_p">﷼ سعودي</p>
+            </div>
+            <p id="pdf_price_reveal_disclaimer_p">هذا يُعتبر عرض سعر فقط، ولا يعني أن الغرف متاحة إلا بعد التحقق واعتماد
+                الطلب</p>
         </div>
-    </div>
 
-    <!-- Luxury price reveal card -->
-    <div id="pdf_price_reveal_card_div">
-        <div id="pdf_price_reveal_top_band_div">
-            <ion-icon name="cash-outline" id="pdf_price_band_icon"></ion-icon>
-            <p id="pdf_price_reveal_top_label_p">الإجمالي الكلي للبرنامج</p>
+        <!-- Gold ornament row -->
+        <div id="pdf_price_ornament_row_div">
+            <span class="pdf_price_ornament_line_span"></span>
+            <span class="pdf_price_ornament_star_span">✶</span>
+            <span class="pdf_price_ornament_star_span">✶</span>
+            <span class="pdf_price_ornament_star_span">✶</span>
+            <span class="pdf_price_ornament_line_span"></span>
         </div>
-        <div id="package_total_price_div">
-            <h6 onclick="runDeleteThisPackageIncludingDataText('package_total_price_p_id')" style="cursor: pointer;">الإجمالي</h6>
-            <p id="package_total_price_p_id" onclick="runDeleteThisPackageIncludingDataText('package_total_price_p_id')" style="cursor: pointer;"></p>
-            <p id="pdf_price_currency_label_p">﷼ سعودي</p>
-        </div>
-        <p id="pdf_price_reveal_disclaimer_p">هذا يُعتبر عرض سعر فقط، ولا يعني أن الغرف متاحة إلا بعد التحقق واعتماد الطلب</p>
-    </div>
 
-    <!-- Gold ornament row -->
-    <div id="pdf_price_ornament_row_div">
-        <span class="pdf_price_ornament_line_span"></span>
-        <span class="pdf_price_ornament_star_span">✶</span>
-        <span class="pdf_price_ornament_star_span">✶</span>
-        <span class="pdf_price_ornament_star_span">✶</span>
-        <span class="pdf_price_ornament_line_span"></span>
-    </div>
+        <!-- Hidden store element -->
+        <p id="store_google_sheet_package_total_price_value" style="display: none;"></p>
 
-    <!-- Hidden store element -->
-    <p id="store_google_sheet_package_total_price_value" style="display: none;"></p>
-
-</section>
+    </section>
 
 
 
@@ -2616,6 +2672,7 @@
     <script src="create-new-package-all-clint-visiting-places.js"></script>
     <script src="create-new-package-setup.js"></script>
     <script src="thank-you-page.js"></script>
+    <script src="package-price-main.js"></script>
 
     <div id="custom_date_picker_backdrop" onclick="closeCustomDatePicker()"></div>
     <div id="custom_date_picker_dropdown">
