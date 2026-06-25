@@ -14,10 +14,15 @@
 
 
 
-    <link rel="stylesheet" href="create-new-package-insert-data.css" />
+    <link rel="stylesheet" href="create-new-package-insert-data.css?v=3" />
     <link rel="stylesheet" href="create-new-package-setup.css" />
     <link rel="stylesheet" href="thank-you-page.css" />
     <link rel="stylesheet" href="package-price.css?v=7" />
+
+    <!-- Display font for the total-price number -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" />
 
 
     <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48" />
@@ -1262,7 +1267,8 @@
                 </div>
 
                 <input type="text" id="domestic_flight_price_input_id" placeholder="سعر الطيران الداخلي"
-                    autocomplete="off" oninput="formatPriceInput(this); updateDomesticFlightPrice()" style="margin-top: 15px;">
+                    autocomplete="off" oninput="formatPriceInput(this); updateDomesticFlightPrice()"
+                    style="margin-top: 15px;">
 
 
                 <div class="edit_data_controll_icons_div">
@@ -2558,15 +2564,11 @@
         <div id="pdf_price_reveal_card_div">
             <div id="pdf_price_reveal_top_band_div">
                 <ion-icon name="cash-outline" id="pdf_price_band_icon"></ion-icon>
-                <p id="pdf_price_reveal_top_label_p">الإجمالي الكلي للبرنامج</p>
+                <p id="pdf_price_reveal_top_label_p">إجمالي البكج</p>
             </div>
             <div id="package_total_price_div">
-                <h6 onclick="runDeleteThisPackageIncludingDataText('package_total_price_pdf_p_id')"
-                    style="cursor: pointer;">الإجمالي</h6>
-                <p id="package_total_price_pdf_p_id"
-                    onclick="runDeleteThisPackageIncludingDataText('package_total_price_pdf_p_id')"
-                    style="cursor: pointer;"></p>
-                <p id="pdf_price_currency_label_p">﷼ سعودي</p>
+                <p id="package_total_price_pdf_p_id" style="cursor: pointer;"></p>
+                <p id="pdf_price_currency_label_p">ريال سعودي</p>
             </div>
             <p id="pdf_price_reveal_disclaimer_p">هذا يُعتبر عرض سعر فقط، ولا يعني أن الغرف متاحة إلا بعد التحقق واعتماد
                 الطلب</p>

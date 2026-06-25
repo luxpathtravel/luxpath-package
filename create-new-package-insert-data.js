@@ -774,7 +774,9 @@ createAllPackageIncludingAndNotIncludingData = function () {
                 if (id === 'watersport_activity_checkbox') {
                     p.innerHTML += " 🌊استمتعوا ب 3 ألعاب بحرية ممتعة<br>كلها مشمولة بدون أي رسوم إضافية💙<br>";
                     p.setAttribute('data-gift-order', '1');
-                    let container = document.createElement('div');
+                    // Use a <span> (not <div>) so it's valid inside the <p>; a <div> would be
+                    // ejected from the <p> when the saved HTML is re-parsed on import.
+                    let container = document.createElement('span');
                     container.className = 'activity_icon_container';
                     ['activities/donat.webp', 'activities/panana.webp', 'activities/parasut.webp'].forEach(src => {
                         let img = document.createElement('img');
@@ -786,7 +788,9 @@ createAllPackageIncludingAndNotIncludingData = function () {
                 } else if (id === 'rafting_activity_checkbox') {
                     p.innerHTML += " 🚣‍♂️اكتشف متعة التجديف<br>لحظات حماس وتجربة لاتُنسى هدية منا لكم💙<br>";
                     p.setAttribute('data-gift-order', '2');
-                    let container = document.createElement('div');
+                    // Use a <span> (not <div>) so it's valid inside the <p>; a <div> would be
+                    // ejected from the <p> when the saved HTML is re-parsed on import.
+                    let container = document.createElement('span');
                     container.className = 'activity_icon_container';
                     let img = document.createElement('img');
                     img.src = 'activities/rafting.webp';
@@ -835,7 +839,9 @@ createAllPackageIncludingAndNotIncludingData = function () {
                     p.style.padding = '0 5px';
                     document.getElementById('store_google_sheet_package_including_sms_value').innerText = smsCardWithInternetAmountInputReayText !== '' ? smsCardWithInternetAmountInputReayText : '';
                     p.setAttribute('data-gift-order', '3');
-                    let container = document.createElement('div');
+                    // Use a <span> (not <div>) so it's valid inside the <p>; a <div> would be
+                    // ejected from the <p> when the saved HTML is re-parsed on import.
+                    let container = document.createElement('span');
                     container.className = 'activity_icon_container';
                     let img = document.createElement('img');
                     img.src = 'activities/sms-cards.webp';
@@ -848,7 +854,9 @@ createAllPackageIncludingAndNotIncludingData = function () {
                         if (index < labelText.length - 1) p.appendChild(document.createElement('br'));
                     });
                     p.setAttribute('data-gift-order', '4');
-                    let container = document.createElement('div');
+                    // Use a <span> (not <div>) so it's valid inside the <p>; a <div> would be
+                    // ejected from the <p> when the saved HTML is re-parsed on import.
+                    let container = document.createElement('span');
                     container.className = 'activity_icon_container';
                     let img = document.createElement('img');
                     img.src = 'activities/flower.webp';
@@ -861,7 +869,9 @@ createAllPackageIncludingAndNotIncludingData = function () {
                         if (index < labelText.length - 1) p.appendChild(document.createElement('br'));
                     });
                     p.setAttribute('data-gift-order', '5');
-                    let container = document.createElement('div');
+                    // Use a <span> (not <div>) so it's valid inside the <p>; a <div> would be
+                    // ejected from the <p> when the saved HTML is re-parsed on import.
+                    let container = document.createElement('span');
                     container.className = 'activity_icon_container';
                     let img = document.createElement('img');
                     img.src = 'activities/special-oud.webp';

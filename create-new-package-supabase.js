@@ -443,6 +443,33 @@ function findSelectedNameAndImportContent() {
 
 
 
+// Repair gift cards from older saves. Those stored a <div class="activity_icon_container">
+// inside the <p> card; re-parsing the saved HTML ejects that <div> out of the <p> (HTML
+// doesn't allow a <div> inside a <p>) and leaves an empty <p> behind. This moves each
+// ejected container back into its card and removes the stray empty cards.
+function _repairGiftCardStructure() {
+    const giftDiv = document.getElementById('inserted_package_icluding_gift_data_div');
+    if (!giftDiv) return;
+
+    Array.from(giftDiv.children).forEach(node => {
+        if (node.classList && node.classList.contains('activity_icon_container')) {
+            // Walk back to the nearest gift card <p> and move the container inside it
+            let card = node.previousElementSibling;
+            while (card && !(card.tagName === 'P' && card.classList.contains('inserted_package_including_data_text'))) {
+                card = card.previousElementSibling;
+            }
+            if (card) card.appendChild(node);
+        }
+    });
+
+    // Drop any leftover empty <p> cards created by the ejected <div>
+    Array.from(giftDiv.children).forEach(p => {
+        if (p.tagName === 'P' && p.children.length === 0 && p.textContent.trim() === '') {
+            p.remove();
+        }
+    });
+}
+
 // Function to import the content for the selected name
 async function importContentForSelectedName(name) {
     // Hide all PDF content sections initially
@@ -511,6 +538,9 @@ async function importContentForSelectedName(name) {
                 }
             }
         }
+
+        // Fix gift cards whose image container was ejected from its <p> during re-parse (older saves)
+        _repairGiftCardStructure();
 
 
 
