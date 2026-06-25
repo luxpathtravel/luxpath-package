@@ -680,7 +680,9 @@ createAllPackageIncludingAndNotIncludingData = function () {
     const _priceTableDiv = document.getElementById('package_price_table_div');
     const _tableNotBuilt = !_priceTableDiv || _priceTableDiv.dataset.built !== 'true';
     const _hasMissingPrice = !_tableNotBuilt && _priceTableDiv.innerText.includes('لايوجد سعر');
-    if (_tableNotBuilt || _hasMissingPrice) {
+    // window._pptImportBypass: set true only while re-rendering a saved package on import,
+    // where the price table is rebuilt separately and must not block card regeneration.
+    if ((_tableNotBuilt || _hasMissingPrice) && !window._pptImportBypass) {
         playSoundEffect('error');
         package_including_data_inputs_submit_icon.style.backgroundColor = 'rgb(255, 0, 0)';
         setTimeout(() => {
@@ -2186,6 +2188,7 @@ createHotelsDataFunction = function () {
 
             let extraInfoSpan = document.createElement('span');
             extraInfoSpan.id = `hotel_extra_info_span_id_${insertedHotelDataDivUniqueId}`;
+            extraInfoSpan.className = 'hotel_more_info_span_class';
             extraInfoSpan.innerText = `+ ${cleanedExtraInfoText}`;
             extraInfoSpan.style.width = '100%';
             extraInfoSpan.style.background = 'rgb(85, 127, 137)';
@@ -2266,6 +2269,7 @@ createHotelsDataFunction = function () {
 
                 let extraInfoSpan_2 = document.createElement('span');
                 extraInfoSpan_2.id = `hotel_extra_info_span_id_2_${insertedHotelDataDivUniqueId}`;
+                extraInfoSpan_2.className = 'hotel_more_info_span_class';
                 extraInfoSpan_2.innerText = `+ ${cleanedExtraInfoText}`;
                 extraInfoSpan_2.style.width = '100%';
                 extraInfoSpan_2.style.background = 'rgb(5, 17, 21)';
@@ -2440,6 +2444,7 @@ createHotelsDataFunction = function () {
 
             let extraInfoSpan = document.createElement('span');
             extraInfoSpan.id = `hotel_extra_info_span_id_${insertedHotelDataDivUniqueId}`;
+            extraInfoSpan.className = 'hotel_more_info_span_class';
             extraInfoSpan.innerText = `+ ${cleanedExtraInfoText}`;
             extraInfoSpan.style.width = '100%';
             extraInfoSpan.style.background = 'rgb(85, 127, 137)';
@@ -2518,6 +2523,7 @@ createHotelsDataFunction = function () {
 
                 let extraInfoSpan_2 = document.createElement('span');
                 extraInfoSpan_2.id = `hotel_extra_info_span_id_2_${insertedHotelDataDivUniqueId}`;
+                extraInfoSpan_2.className = 'hotel_more_info_span_class';
                 extraInfoSpan_2.innerText = `+ ${cleanedExtraInfoText}`;
                 extraInfoSpan_2.style.width = '100%';
                 extraInfoSpan_2.style.background = 'rgb(5, 17, 21)';
@@ -3939,6 +3945,7 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
 
                 let extraInfoSpan = document.createElement('span');
                 extraInfoSpan.id = `hotel_extra_info_span_id_${insertedHotelDataDivUniqueId}`;
+                extraInfoSpan.className = 'hotel_more_info_span_class';
                 extraInfoSpan.innerText = `+ ${cleanedExtraInfoText}`;
                 extraInfoSpan.style.width = '100%';
                 extraInfoSpan.style.background = 'rgb(85, 127, 137)';
@@ -4017,6 +4024,7 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
 
                     let extraInfoSpan_2 = document.createElement('span');
                     extraInfoSpan_2.id = `hotel_extra_info_span_id_2_${insertedHotelDataDivUniqueId}`;
+                    extraInfoSpan_2.className = 'hotel_more_info_span_class';
                     extraInfoSpan_2.innerText = `+ ${cleanedExtraInfoText}`;
                     extraInfoSpan_2.style.width = '100%';
                     extraInfoSpan_2.style.background = 'rgb(5, 17, 21)';
@@ -4129,6 +4137,7 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
 
                 let extraInfoSpan = document.createElement('span');
                 extraInfoSpan.id = `hotel_extra_info_span_id_${insertedHotelDataDivUniqueId}`;
+                extraInfoSpan.className = 'hotel_more_info_span_class';
                 extraInfoSpan.innerText = `+ ${cleanedExtraInfoText}`;
                 extraInfoSpan.style.width = '100%';
                 extraInfoSpan.style.background = 'rgb(85, 127, 137)';
@@ -4207,6 +4216,7 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
 
                     let extraInfoSpan_2 = document.createElement('span');
                     extraInfoSpan_2.id = `hotel_extra_info_span_id_2_${insertedHotelDataDivUniqueId}`;
+                    extraInfoSpan_2.className = 'hotel_more_info_span_class';
                     extraInfoSpan_2.innerText = `+ ${cleanedExtraInfoText}`;
                     extraInfoSpan_2.style.width = '100%';
                     extraInfoSpan_2.style.background = 'rgb(5, 17, 21)';

@@ -11,37 +11,16 @@ async function sendDataToSupabase() {
             const formattedName = document.getElementById("package_user_code_name_for_later_import_reference_p_id")?.innerText.trim();
 
 
-            // Clean HTML sections
-            const downloaded_pdf_clint_data_page = cleanHTML(document.getElementById("downloaded_pdf_clint_data_page")?.innerHTML || "");
-            const downloaded_pdf_flight_data_page = cleanHTML(document.getElementById("downloaded_pdf_flight_data_page")?.innerHTML || "");
-            const downloaded_pdf_hotel_data_page = cleanHTML(document.getElementById("downloaded_pdf_hotel_data_page")?.innerHTML || "");
-            const downloaded_pdf_clint_movements_data_page = cleanHTML(document.getElementById("downloaded_pdf_clint_movements_data_page")?.innerHTML || "");
-            const downloaded_pdf_package_including_data_page = cleanHTML(document.getElementById("downloaded_pdf_package_including_data_page")?.innerHTML || "");
-            const downloaded_pdf_total_price_data_page = cleanHTML(document.getElementById("downloaded_pdf_total_price_data_page")?.innerHTML || "");
-
-            // Last month parsing
-            const rawDate = document.getElementById("whole_package_end_date_input_id")?.value.trim();
-            const arabicToEnglish = {
-                "يناير": "Jan", "فبراير": "Feb", "مارس": "Mar", "أبريل": "Apr", "مايو": "May", "يونيو": "Jun",
-                "يوليو": "Jul", "أغسطس": "Aug", "سبتمبر": "Sep", "أكتوبر": "Oct", "نوفمبر": "Nov", "ديسمبر": "Dec"
-            };
-            const parts = rawDate.split(" ").filter(Boolean);
-            const month = arabicToEnglish[parts.find(word => arabicToEnglish[word])] || "Invalid";
-            const package_indo_last_month_date = `${month}`;
+            // Capture the package as pure structured data (no HTML) — see serializePackage()
+            const package_data = serializePackage();
 
             // Current timestamp
             const package_indo_user_current_date = new Date().toISOString();
 
             const rowData = {
                 name: formattedName,
-                downloaded_pdf_clint_data_page,
-                downloaded_pdf_flight_data_page,
-                downloaded_pdf_hotel_data_page,
-                downloaded_pdf_clint_movements_data_page,
-                downloaded_pdf_package_including_data_page,
-                downloaded_pdf_total_price_data_page,
-                package_indo_user_current_date,
-                package_indo_last_month_date
+                package_data,
+                package_indo_user_current_date
             };
 
             if (existingDataStatus === "newData") {
@@ -110,13 +89,450 @@ async function sendDataToSupabase() {
 
 
 
-// Function to clean HTML by removing unnecessary attributes and tags
-function cleanHTML(html) {
-    // Remove HTML comments
-    html = html.replace(/<!--[\s\S]*?-->/g, '');
+/* ════════════════════════════════════════════════════════════════════════════
+   STRUCTURED PACKAGE DATA  (serialize ⇄ render)
 
-    // Trim excessive spaces
-    return html.replace(/\s+/g, ' ').trim();
+   Packages are stored in `indo_all_package.package_data` (jsonb) as pure DATA —
+   no HTML at all. On import we rebuild ONLY the dynamic parts of each PDF section
+   from that data; the static section skeletons (arch hero, skyline SVG, table
+   headers, the hidden `store_google_sheet_*` markers) stay in index.html, so a
+   package always re-renders with the CURRENT markup — changing an element no
+   longer leaves stale HTML frozen in the database.
+
+   ⚠ The row shapes produced by the _render* helpers MIRROR the builder templates
+   in create-new-package-insert-data.js (createHotelsDataFunction,
+   createAllFlightDataFunction/editClickedFlightData, autoCreateALlClintMovementsData,
+   createWholePackageAndClintDataFunction). If you change a row's markup in one of
+   those builders, mirror the change in the matching _render* helper here.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+const PACKAGE_DATA_VERSION = 1;
+
+/* All hidden `store_google_sheet_*` markers, keyed by a short name. These hold the
+   scalar package fields and are read back by reActiveDragAndDropFunctionality() to
+   restore inputs/checkboxes — so we just round-trip their text. */
+const _PKG_MARKERS = {
+    clintName: 'store_google_sheet_clint_name_value',
+    clintCode: 'store_google_sheet_package_clint_code_number_value',
+    adults: 'store_google_sheet_package_adult_amount_value',
+    kids: 'store_google_sheet_package_kids_amount_value',
+    infant: 'store_google_sheet_package_infant_amount_value',
+    firstDate: 'store_google_sheet_whole_package_first_date_value',
+    lastDate: 'store_google_sheet_whole_package_last_date_value',
+    nights: 'store_google_sheet_whole_package_total_nights_value',
+    company: 'store_google_sheet_clint_company_name_value',
+    user: 'store_google_sheet_package_user_name_value',
+    priceType: 'store_google_sheet_clint_package_price_type_checkbox_value',
+    packageType: 'store_google_sheet_clint_package_type_checkbox_value',
+    rawCode: 'store_google_sheet_package_raw_user_with_no_riv_for_later_reference_when_importing',
+    datesHidden: 'store_google_sheet_all_package_dates_hidden_or_no',
+    flightUid: 'store_google_sheet_flight_uniuqe_id_name_value',
+    hotelUid: 'store_google_sheet_hotel_uniuqe_id_name_value',
+    hotelLastCheckout: 'store_google_sheet_hotel_last_stopped_check_out_date_value',
+    sms: 'store_google_sheet_package_including_sms_value',
+    innerTickets: 'store_google_sheet_package_including_inner_tickets_value',
+    details: 'store_google_sheet_package_details_textarea_value',
+    carType: 'store_google_sheet_package_specific_car_type_value',
+    totalPrice: 'store_google_sheet_package_total_price_value',
+};
+
+function _pkgText(id) { const el = document.getElementById(id); return el ? el.innerText : ''; }
+function _pkgSetText(id, val) { const el = document.getElementById(id); if (el) el.innerText = (val == null ? '' : val); }
+
+
+/* ── SERIALIZE ─────────────────────────────────────────────────────────────── */
+
+function serializePackage() {
+    const markers = {};
+    for (const k in _PKG_MARKERS) markers[k] = _pkgText(_PKG_MARKERS[k]);
+
+    // The three checkbox-state divs each list the checkbox ids (one per <p>)
+    const readIds = divId => Array.from(
+        document.getElementById(divId)?.querySelectorAll('p') || []
+    ).map(p => p.innerText).filter(Boolean);
+
+    return {
+        version: PACKAGE_DATA_VERSION,
+        markers,
+        packageCode: _pkgText('package_user_code_name_for_later_import_reference_p_id'),
+        clintCodeHasValue: document.getElementById('package_clint_code_number_p_id')?.getAttribute('data-has-value') || 'false',
+        checkboxColors: {
+            green: readIds('store_google_sheet_green_checked_package_including_and_not_including_input_div'),
+            red: readIds('store_google_sheet_red_checked_package_including_and_not_including_input_div'),
+            white: readIds('store_google_sheet_white_package_including_and_not_including_input_div'),
+        },
+        showPriceInPdf: !!document.getElementById('show_package_total_price_checkbox')?.checked,
+        totalPricePdf: _pkgText('package_total_price_pdf_p_id'),
+        hotels: _serializeHotels(),
+        flights: _serializeFlights(),
+        movements: _serializeMovements(),
+    };
+}
+
+/* Reads each hotel row using the same sub-element id patterns as editClickedHotelDataFunction */
+function _serializeHotels() {
+    const rows = document.querySelectorAll('#inserted_hotel_data_position_div .hotel_row_class_for_editing');
+    return Array.from(rows).map(row => {
+        const uid = row.id.split('_').pop();
+        const txt = sel => (row.querySelector(sel)?.innerText ?? '');
+        const urlCell = row.querySelector('.hotel-row-url-cell');
+        const lastImg = row.querySelector('div:last-child img');
+        const hotel = {
+            uid,
+            isWriting: row.classList.contains('new_hotel_data_by_user_writing_class'),
+            name: txt(`h1[id^='hotel_name_${uid}']`),
+            checkIn: txt(`h2[id^='hotel_check_in_${uid}']`),
+            checkOut: txt(`h3[id^='hotel_check_out_${uid}']`),
+            nights: txt(`h4[id^='hotel_total_nights_${uid}']`),
+            location: txt(`h5[id^='hotel_location_${uid}']`),
+            area: txt(`h6[id^='hotel_area_${uid}']`),
+            imageSrc: lastImg ? lastImg.getAttribute('src') : '',
+            room1: {
+                ar: txt(`span[id^='hotel_room_arabic_type_description_${uid}']`),
+                en: txt(`span[id^='hotel_room_type_description_${uid}']`),
+                units: txt(`p[id^='hotel_total_unit_${uid}']`),
+                breakfast: txt(`span[id^='hotel_breakfast_span_id_${uid}']`),
+                extraBed: txt(`span[id^='hotel_extra_bed_span_id_${uid}']`),
+                special: txt(`span[id^='hotel_special_request_span_id_${uid}']`),
+                extraInfo: txt(`span[id^='hotel_extra_info_span_id_${uid}']`),
+            },
+            safeSidePrice: row.dataset.safeSidePrice || '',
+            safeSidePrice2: row.dataset.safeSidePrice2 || '',
+            urlCell: urlCell ? {
+                hotelName: urlCell.getAttribute('data-hotel-name') || '',
+                roomTypeEn: urlCell.getAttribute('data-room-type-en') || '',
+                isNewWriting: urlCell.getAttribute('data-is-new-writing') || '',
+                url: urlCell.getAttribute('data-url') || '',
+            } : null,
+        };
+        // Second room exists only when its room-type span is present
+        if (row.querySelector(`span[id^='hotel_room_type_description_2_${uid}']`)) {
+            hotel.room2 = {
+                ar: txt(`span[id^='hotel_room_arabic_type_description_2_${uid}']`),
+                en: txt(`span[id^='hotel_room_type_description_2_${uid}']`),
+                units: txt(`p[id^='hotel_total_unit_2_${uid}']`),
+                breakfast: txt(`span[id^='hotel_breakfast_span_id_2_${uid}']`),
+                extraBed: txt(`span[id^='hotel_extra_bed_span_id_2_${uid}']`),
+                special: txt(`span[id^='hotel_special_request_span_id_2_${uid}']`),
+                extraInfo: txt(`span[id^='hotel_extra_info_span_id_2_${uid}']`),
+            };
+        }
+        return hotel;
+    });
+}
+
+/* Reads each flight row using the same sub-element id patterns as editClickedFlightData */
+function _serializeFlights() {
+    const rows = document.querySelectorAll('#inserted_flight_data_position_div .flight_row_class_for_editing');
+    return Array.from(rows).map(row => {
+        const uid = row.id.split('_').pop();
+        const txt = sel => (row.querySelector(sel)?.innerText ?? '');
+        return {
+            uid,
+            airline: txt(`p[id^='flight_air_line_${uid}']`),
+            adult: txt(`p[id^='flight_adult_person_amount_${uid}']`),
+            infant: txt(`p[id^='flight_infant_person_amount_${uid}']`),
+            extraBags: txt(`p[id^='flight_extra_bags_${uid}']`),
+            fromCity: txt(`h2[id^='flight_from_city_${uid}']`),
+            toCity: txt(`h3[id^='flight_to_city_${uid}']`),
+            date: txt(`h1[id^='flight_date_${uid}']`),
+        };
+    });
+}
+
+/* Every movement row (auto / manual / free-transport / split) shares one 3-cell shape */
+function _serializeMovements() {
+    const rows = document.querySelectorAll('#inserted_clint_movements_data_position_div .clint_movements_row_class_for_editing');
+    return Array.from(rows).map(row => ({
+        date: row.querySelector('h1')?.innerText ?? '',
+        details: row.querySelector('h2')?.innerText ?? '',
+        city: row.querySelector('h3')?.innerText ?? '',
+    }));
+}
+
+
+/* ── RENDER ────────────────────────────────────────────────────────────────── */
+
+function renderPackageFromData(d) {
+    if (!d || typeof d !== 'object') return;
+
+    // 1. Clear the dynamic row containers (static skeletons stay)
+    ['inserted_hotel_data_position_div', 'inserted_flight_data_position_div', 'inserted_clint_movements_data_position_div']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+
+    // 2. Client section: set every scalar marker, then rebuild the visible client DOM
+    const m = d.markers || {};
+    for (const k in _PKG_MARKERS) _pkgSetText(_PKG_MARKERS[k], m[k] || '');
+    _renderClientSection(d);
+
+    // 3. Inclusion checkbox-state divs (green/red/white lists of checkbox ids)
+    const setColorDiv = (divId, ids) => {
+        const el = document.getElementById(divId); if (!el) return;
+        el.innerHTML = '';
+        (ids || []).forEach(cid => { const p = document.createElement('p'); p.innerText = cid; el.appendChild(p); });
+    };
+    setColorDiv('store_google_sheet_green_checked_package_including_and_not_including_input_div', d.checkboxColors && d.checkboxColors.green);
+    setColorDiv('store_google_sheet_red_checked_package_including_and_not_including_input_div', d.checkboxColors && d.checkboxColors.red);
+    setColorDiv('store_google_sheet_white_package_including_and_not_including_input_div', d.checkboxColors && d.checkboxColors.white);
+
+    // 4-6. Hotels / flights / movements rows
+    const hotelPos = document.getElementById('inserted_hotel_data_position_div');
+    (d.hotels || []).forEach(h => hotelPos.appendChild(_renderHotelRow(h)));
+    document.getElementById('downloaded_pdf_hotel_data_page').style.display = (d.hotels && d.hotels.length) ? 'block' : 'none';
+
+    const flightPos = document.getElementById('inserted_flight_data_position_div');
+    (d.flights || []).forEach(f => flightPos.appendChild(_renderFlightRow(f)));
+    document.getElementById('downloaded_pdf_flight_data_page').style.display = (d.flights && d.flights.length) ? 'block' : 'none';
+
+    const movePos = document.getElementById('inserted_clint_movements_data_position_div');
+    (d.movements || []).forEach(mv => movePos.appendChild(_renderMovementRow(mv)));
+    document.getElementById('downloaded_pdf_clint_movements_data_page').style.display = (d.movements && d.movements.length) ? 'block' : 'none';
+
+    // 7. Re-wire every section (restores inputs from markers, drag-drop, controllers, checkbox colors)
+    ['downloaded_pdf_clint_data_page', 'downloaded_pdf_hotel_data_page', 'downloaded_pdf_flight_data_page',
+        'downloaded_pdf_clint_movements_data_page', 'downloaded_pdf_package_including_data_page'].forEach(sec => {
+            try { reActiveDragAndDropFunctionality(sec); } catch (e) { console.warn('re-wire failed for', sec, e); }
+        });
+
+    // 8. Inclusion cards: regenerate from the restored checkbox colors + inputs (price-guard bypassed)
+    _rebuildInclusionsAndPrice(d);
+}
+
+/* Rebuilds the client/cover dynamic DOM from the scalar markers (mirrors createWholePackageAndClintDataFunction) */
+function _renderClientSection(d) {
+    const m = d.markers || {};
+
+    _pkgSetText('package_user_code_name_for_later_import_reference_p_id', d.packageCode || '');
+
+    const codeP = document.getElementById('package_clint_code_number_p_id');
+    if (codeP) { codeP.innerText = m.clintCode || ''; codeP.setAttribute('data-has-value', d.clintCodeHasValue || 'false'); }
+
+    // Package-type badge + emoji. NB: the marker stores the legacy spelling "بكج شهل عسل".
+    const typeMap = {
+        'بكج شهل عسل': { label: 'بكج شهر عسل', emoji: '👩🏻‍❤️‍👨🏻' },
+        'بكج شباب': { label: 'بكج شباب', emoji: '🤵🏻‍♂️' },
+        'بكج عائلة': { label: 'بكج عائلة', emoji: '👨‍👩‍👧‍👦' },
+        'بكج شخصين': { label: 'بكج شخصين', emoji: '💫' },
+        'بكج قروب': { label: 'بكج قروب', emoji: '🤩' },
+    };
+    const t = typeMap[m.packageType] || { label: 'بكج جديد', emoji: '✨' };
+    const typeH6 = document.getElementById('clint_package_type_h6');
+    if (typeH6) typeH6.innerHTML = t.label;
+    const emojiP = document.getElementById('package_emoji_p_id');
+    if (emojiP) emojiP.innerText = t.emoji;
+
+    const priceH6 = document.getElementById('package_price_type_h6_id');
+    if (priceH6) {
+        if (m.priceType) { priceH6.innerHTML = `  (${m.priceType})`; priceH6.style.display = 'block'; }
+        else { priceH6.innerText = ''; priceH6.style.display = 'none'; }
+    }
+
+    const nameP = document.getElementById('clint_full_name_p');
+    const titleDiv = document.getElementById('pdf_clint_info_section_title_div_id');
+    if (nameP) {
+        if (m.clintName) {
+            nameP.innerText = `الأستاذ/ة : ${m.clintName}`;
+            nameP.style.display = 'block';
+            if (titleDiv) titleDiv.style.borderBottom = '0.5px solid black';
+        } else {
+            nameP.innerText = '';
+            nameP.style.display = 'none';
+            if (titleDiv) titleDiv.style.borderBottom = 'none';
+        }
+    }
+
+    // Welcome hero image + company logo (logo onclick is re-wired by reActiveDragAndDropFunctionality)
+    const welcomeImg = document.getElementById('welcome_pdf_first_page_image_id');
+    const logoPos = document.getElementById('inserted_company_name_image_position_div');
+    const existingLogo = document.getElementById('inserted_company_name_logo_id');
+    if (existingLogo) existingLogo.remove();
+    if (m.company) {
+        const dash = m.company.replace(/\s+/g, '-');
+        if (welcomeImg) welcomeImg.src = `خلفية-الشركات/${dash}.jpg`;
+        if (logoPos) {
+            const logo = document.createElement('img');
+            logo.src = `خلفية-الشركات/${dash}.jpg`;
+            logo.className = 'inserted_company_name_logo';
+            logo.id = 'inserted_company_name_logo_id';
+            logoPos.appendChild(logo);
+        }
+    } else if (welcomeImg) {
+        welcomeImg.src = 'first-pdf-image.jpg';
+    }
+
+    // Combined persons + dates + nights row
+    let combined = m.adults || '';
+    if (m.kids) combined += ` + ${m.kids}`;
+    if (m.infant) combined += ` ${m.infant}`;
+    const dataPos = document.getElementById('inserted_clint_data_position_div');
+    if (dataPos) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'clint_data_row_class clint_data_row_class_for_editing';
+        rowDiv.innerHTML =
+            `<div><p></p></div>` +
+            `<div><p id="whole_package_first_date_p_id"></p></div>` +
+            `<div><p id="whole_package_last_date_p_id"></p></div>` +
+            `<div><p></p></div>`;
+        const ps = rowDiv.querySelectorAll('p');
+        ps[0].innerText = combined;
+        ps[1].innerText = m.firstDate || '';
+        ps[2].innerText = m.lastDate || '';
+        ps[3].innerText = m.nights || '';
+        dataPos.innerHTML = '';
+        dataPos.appendChild(rowDiv);
+    }
+    const headerRow = document.getElementById('clint_data_row_main_div_id');
+    if (headerRow) headerRow.style.display = 'flex';
+
+    document.getElementById('downloaded_pdf_clint_data_page').style.display = 'block';
+}
+
+/* Builds one hotel row identical to createHotelsDataFunction's output */
+function _renderHotelRow(h) {
+    const uid = h.uid;
+    const div = document.createElement('div');
+    div.id = `hotel_row_id_${uid}`;
+    div.className = h.isWriting
+        ? 'hotel_row_class hotel_row_class_for_editing new_hotel_data_by_user_writing_class'
+        : 'hotel_row_class hotel_row_class_for_editing';
+    if (h.safeSidePrice) div.dataset.safeSidePrice = h.safeSidePrice;
+    if (h.safeSidePrice2) div.dataset.safeSidePrice2 = h.safeSidePrice2;
+
+    const room2 = h.room2;
+    const r1 = h.room1 || {};
+    const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    let urlAttrs = 'class="hotel-row-url-cell"';
+    if (h.urlCell) {
+        urlAttrs = `class="hotel-row-url-cell" data-hotel-name="${esc(h.urlCell.hotelName)}" data-room-type-en="${esc(h.urlCell.roomTypeEn)}" data-is-new-writing="${esc(h.urlCell.isNewWriting)}"` +
+            (h.urlCell.url ? ` data-url="${esc(h.urlCell.url)}"` : '');
+    }
+    const imgId = h.isWriting ? ` id='hotel_image_${uid}'` : '';
+    const unitCell =
+        `<p id='hotel_total_unit_${uid}'></p>` +
+        (room2 ? `<p style="width: 100%; background: rgb(5, 17, 21); color: white">+ </p><p id="hotel_total_unit_2_${uid}" style="width: 100%; background: rgb(5, 17, 21); color: white"></p>` : '');
+
+    div.innerHTML =
+        `<div><h1 id='hotel_name_${uid}'></h1></div>` +
+        `<div><h2 id='hotel_check_in_${uid}' class="hotel_check_in_date_for_matching_whole_package_date"></h2></div>` +
+        `<div><h3 style="color: red" id='hotel_check_out_${uid}' class="hotel_check_out_date_for_matching_whole_package_date"></h3></div>` +
+        `<div><h4 id='hotel_total_nights_${uid}'></h4></div>` +
+        `<div class="description_cell"><span id='hotel_room_arabic_type_description_${uid}'></span><span id='hotel_room_type_description_${uid}'></span></div>` +
+        `<div>${unitCell}</div>` +
+        `<div ${urlAttrs}><h5 id='hotel_location_${uid}'></h5>${h.area ? `<br><h6 id='hotel_area_${uid}'></h6>` : ''}<img src="${esc(h.imageSrc)}"${imgId} class="hotel_row_image_controller inserted_hotel_data_row" style="cursor: pointer"></div>`;
+
+    // Fill text via innerText (so hotel/room names with special chars can't break markup)
+    const setText = (sel, v) => { const e = div.querySelector(sel); if (e) e.innerText = (v == null ? '' : v); };
+    setText(`#hotel_name_${uid}`, h.name);
+    setText(`#hotel_check_in_${uid}`, h.checkIn);
+    setText(`#hotel_check_out_${uid}`, h.checkOut);
+    setText(`#hotel_total_nights_${uid}`, h.nights);
+    setText(`#hotel_room_arabic_type_description_${uid}`, r1.ar);
+    setText(`#hotel_room_type_description_${uid}`, r1.en);
+    setText(`#hotel_total_unit_${uid}`, r1.units);
+    setText(`#hotel_location_${uid}`, h.location);
+    if (h.area) setText(`#hotel_area_${uid}`, h.area);
+    if (room2) setText(`#hotel_total_unit_2_${uid}`, room2.units);
+
+    // Optional description spans — same insert/append order & styling as the builder
+    const descCell = div.querySelector('.description_cell');
+    const enSpan = div.querySelector(`#hotel_room_type_description_${uid}`);
+    const mkSpan = (id, text, css, cls) => {
+        const s = document.createElement('span');
+        if (id) s.id = id;
+        if (cls) s.className = cls;
+        if (css) s.style.cssText = css;
+        s.innerText = text;
+        return s;
+    };
+    const dark = 'background: rgb(85, 127, 137); color: white; padding: 0 5px';
+    if (r1.breakfast) descCell.insertBefore(mkSpan(`hotel_breakfast_span_id_${uid}`, r1.breakfast), enSpan);
+    if (r1.extraBed) descCell.appendChild(mkSpan(`hotel_extra_bed_span_id_${uid}`, r1.extraBed, 'width: 100%; ' + dark, 'hotel_special_request_span_class'));
+    if (r1.special) descCell.appendChild(mkSpan(`hotel_special_request_span_id_${uid}`, r1.special, dark, 'hotel_special_request_span_class'));
+    if (r1.extraInfo) descCell.appendChild(mkSpan(`hotel_extra_info_span_id_${uid}`, r1.extraInfo, 'width: 100%; ' + dark));
+
+    if (room2) {
+        const darker = 'background: rgb(5, 17, 21); color: white';
+        const en2 = mkSpan(`hotel_room_type_description_2_${uid}`, room2.en, 'width: 100%; ' + darker);
+        if (room2.ar) {
+            descCell.appendChild(mkSpan('', '+ ', 'width: 100%; ' + darker));
+            descCell.appendChild(mkSpan(`hotel_room_arabic_type_description_2_${uid}`, room2.ar, 'width: 100%; ' + darker));
+        }
+        if (room2.breakfast) descCell.appendChild(mkSpan(`hotel_breakfast_span_id_2_${uid}`, room2.breakfast, 'width: 100%; ' + darker));
+        descCell.appendChild(en2);
+        if (room2.extraBed) descCell.appendChild(mkSpan(`hotel_extra_bed_span_id_2_${uid}`, room2.extraBed, 'width: 100%; ' + darker + '; padding: 0 5px', 'hotel_special_request_span_class'));
+        if (room2.special) descCell.appendChild(mkSpan(`hotel_special_request_span_id_2_${uid}`, room2.special, 'width: 100%; ' + darker + '; padding: 0 5px', 'hotel_special_request_span_class'));
+        if (room2.extraInfo) descCell.appendChild(mkSpan(`hotel_extra_info_span_id_2_${uid}`, room2.extraInfo, 'width: 100%; ' + darker + '; padding: 0 5px'));
+    }
+
+    return div;
+}
+
+/* Builds one flight row identical to editClickedFlightData's confirmed-row output */
+function _renderFlightRow(f) {
+    const uid = f.uid;
+    const div = document.createElement('div');
+    div.id = `flight_row_id_${uid}`;
+    div.className = 'flight_row_class flight_row_class_for_editing';
+    div.innerHTML =
+        `<div class="flight_row_flight_arrival_time_controller inserted_flight_data_row" style="cursor: pointer;">${f.airline ? `<p id="flight_air_line_${uid}"></p>` : ''}</div>` +
+        `<div><p id="flight_adult_person_amount_${uid}"></p>${f.infant ? `<p id="flight_infant_person_amount_${uid}"></p>` : ''}</div>` +
+        `<div><p>20Kg للشخص</p>${f.extraBags ? `<p id="flight_extra_bags_${uid}"></p>` : ''}</div>` +
+        `<div>${f.fromCity ? `<h2 id="flight_from_city_${uid}"></h2>` : ''}</div>` +
+        `<div>${f.toCity ? `<h3 id="flight_to_city_${uid}"></h3>` : ''}</div>` +
+        `<div>${f.date ? `<h1 id="flight_date_${uid}" class="flight_date_for_matching_whole_package_date"></h1>` : ''}</div>`;
+    const set = (sel, v) => { const e = div.querySelector(sel); if (e) e.innerText = v; };
+    if (f.airline) set(`#flight_air_line_${uid}`, f.airline);
+    set(`#flight_adult_person_amount_${uid}`, f.adult);
+    if (f.infant) set(`#flight_infant_person_amount_${uid}`, f.infant);
+    if (f.extraBags) set(`#flight_extra_bags_${uid}`, f.extraBags);
+    if (f.fromCity) set(`#flight_from_city_${uid}`, f.fromCity);
+    if (f.toCity) set(`#flight_to_city_${uid}`, f.toCity);
+    if (f.date) set(`#flight_date_${uid}`, f.date);
+    return div;
+}
+
+/* Builds one movements row identical to autoCreateALlClintMovementsData's output */
+function _renderMovementRow(mv) {
+    const div = document.createElement('div');
+    div.className = 'clint_movements_row_class clint_movements_row_class_for_editing';
+    div.innerHTML =
+        `<div><h1></h1></div>` +
+        `<div><h2></h2></div>` +
+        `<div class="clint_movements_row_controller" style="cursor: pointer;"><h3></h3></div>`;
+    div.querySelector('h1').innerText = mv.date || '';
+    div.querySelector('h2').innerText = mv.details || '';
+    div.querySelector('h3').innerText = mv.city || '';
+    return div;
+}
+
+/* Regenerates the inclusion/gift cards by re-running the real builder (checkbox colors + inputs
+   were restored by reActiveDragAndDropFunctionality), then restores the saved PDF total price.
+   window._pptImportBypass skips the builder's "price table not ready" guard during import. */
+function _rebuildInclusionsAndPrice(d) {
+    const cc = d.checkboxColors || {};
+    try {
+        window._pptImportBypass = true;
+        if (typeof createAllPackageIncludingAndNotIncludingData === 'function' &&
+            ((cc.green && cc.green.length) || (cc.red && cc.red.length))) {
+            createAllPackageIncludingAndNotIncludingData();
+        }
+    } catch (e) {
+        console.warn('inclusions rebuild failed', e);
+    } finally {
+        window._pptImportBypass = false;
+    }
+
+    // The builder recomputes the total from the live price table; restore the saved PDF value instead
+    _pkgSetText('package_total_price_pdf_p_id', d.totalPricePdf || '');
+    _pkgSetText('store_google_sheet_package_total_price_value', d.totalPricePdf || '');
+    const showChk = document.getElementById('show_package_total_price_checkbox');
+    if (showChk) showChk.checked = !!d.showPriceInPdf;
+    const totalSec = document.getElementById('downloaded_pdf_total_price_data_page');
+    if (totalSec) totalSec.style.display = (d.showPriceInPdf && (d.totalPricePdf || '').trim() !== '') ? 'block' : 'none';
+
+    if (typeof ensureAllPackageDatesHiddenOrNo === 'function') {
+        try { ensureAllPackageDatesHiddenOrNo(); } catch (e) { /* no-op */ }
+    }
 }
 
 
@@ -443,33 +859,6 @@ function findSelectedNameAndImportContent() {
 
 
 
-// Repair gift cards from older saves. Those stored a <div class="activity_icon_container">
-// inside the <p> card; re-parsing the saved HTML ejects that <div> out of the <p> (HTML
-// doesn't allow a <div> inside a <p>) and leaves an empty <p> behind. This moves each
-// ejected container back into its card and removes the stray empty cards.
-function _repairGiftCardStructure() {
-    const giftDiv = document.getElementById('inserted_package_icluding_gift_data_div');
-    if (!giftDiv) return;
-
-    Array.from(giftDiv.children).forEach(node => {
-        if (node.classList && node.classList.contains('activity_icon_container')) {
-            // Walk back to the nearest gift card <p> and move the container inside it
-            let card = node.previousElementSibling;
-            while (card && !(card.tagName === 'P' && card.classList.contains('inserted_package_including_data_text'))) {
-                card = card.previousElementSibling;
-            }
-            if (card) card.appendChild(node);
-        }
-    });
-
-    // Drop any leftover empty <p> cards created by the ejected <div>
-    Array.from(giftDiv.children).forEach(p => {
-        if (p.tagName === 'P' && p.children.length === 0 && p.textContent.trim() === '') {
-            p.remove();
-        }
-    });
-}
-
 // Function to import the content for the selected name
 async function importContentForSelectedName(name) {
     // Hide all PDF content sections initially
@@ -507,40 +896,21 @@ async function importContentForSelectedName(name) {
             return;
         }
 
-        // Map the Supabase columns to your HTML elements
-        let contentColumns = {
-            downloaded_pdf_clint_data_page: selectedRow.downloaded_pdf_clint_data_page,
-            downloaded_pdf_package_including_data_page: selectedRow.downloaded_pdf_package_including_data_page,
-            downloaded_pdf_flight_data_page: selectedRow.downloaded_pdf_flight_data_page,
-            downloaded_pdf_hotel_data_page: selectedRow.downloaded_pdf_hotel_data_page,
-            downloaded_pdf_clint_movements_data_page: selectedRow.downloaded_pdf_clint_movements_data_page,
-            downloaded_pdf_total_price_data_page: selectedRow.downloaded_pdf_total_price_data_page
-        };
-
-        let parser = new DOMParser();
-
-        // Process each content section
-        for (let divId in contentColumns) {
-            let rawHtmlString = contentColumns[divId];
-
-            if (rawHtmlString) {
-                // Process the raw HTML before placing it in the website
-                let formattedHtmlString = formatHtmlForWebsite(rawHtmlString);
-                let doc = parser.parseFromString(formattedHtmlString, 'text/html');
-                let newContent = doc.body.innerHTML;
-
-                let htmlSectionPdfPageDiv = document.getElementById(divId);
-                if (htmlSectionPdfPageDiv) {
-                    htmlSectionPdfPageDiv.style.display = 'block';
-                    htmlSectionPdfPageDiv.innerHTML = '';
-                    htmlSectionPdfPageDiv.innerHTML = newContent;
-                    reActiveDragAndDropFunctionality(htmlSectionPdfPageDiv.id);
-                }
-            }
+        // Clean break: new packages carry structured `package_data`. Packages saved under the
+        // old HTML-only format have none and are no longer restorable.
+        let pkgData = selectedRow.package_data;
+        if (!pkgData) {
+            hideOverlay();
+            hideLoadingOverlay();
+            alert('هذا البكج محفوظ بالنظام القديم ولم يعد يدعم الاستعادة.\nالرجاء إعادة إنشائه من جديد\n(مع كامل حبي واحترامي)');
+            return;
+        }
+        if (typeof pkgData === 'string') {
+            try { pkgData = JSON.parse(pkgData); } catch (e) { console.error('❌ Could not parse package_data:', e); }
         }
 
-        // Fix gift cards whose image container was ejected from its <p> during re-parse (older saves)
-        _repairGiftCardStructure();
+        // Rebuild every section's DOM from the structured data (re-renders with current markup)
+        renderPackageFromData(pkgData);
 
 
 
@@ -754,18 +1124,6 @@ function hideLoadingOverlay() {
     }, 220);
 }
 
-
-
-// Function to format the raw HTML content for placing in the website
-function formatHtmlForWebsite(rawHtml) {
-    // Example: Remove unnecessary spaces, add required attributes, etc.
-    let formattedHtml = rawHtml.replace(/\s+/g, ' ').trim();
-
-    // Add more formatting rules as needed
-    // For example, you could use a library like DOMPurify to sanitize the HTML
-
-    return formattedHtml;
-}
 
 
 

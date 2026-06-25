@@ -642,7 +642,7 @@ body.is-dragging * {
     gap: 8px;
     border-radius: 16px;
     text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.15);
     transform: translate(-50%, -130vh);
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -666,7 +666,7 @@ body.is-dragging * {
 .ensure_your_delete_action button:hover {
     opacity: 0.88;
     transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
 }
 
 .ensure_your_delete_action button:active {
@@ -1906,6 +1906,10 @@ body.is-dragging * {
     color: white !important;
 }
 
+#downloaded_pdf_hotel_data_page .hotel_row_class_for_editing .description_cell .hotel_more_info_span_class {
+    color: white !important;
+}
+
 /* Unit count */
 #downloaded_pdf_hotel_data_page .hotel_row_class_for_editing p {
     font-size: clamp(10px, 1.7vw, 17px) !important;
@@ -2107,7 +2111,7 @@ body.is-dragging * {
 
 #downloaded_pdf_package_including_data_page #inserted_package_including_data_div p.special_package_including_data_background_color_text ion-icon {
     color: white !important;
-    background: rgba(255,255,255,0.2) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* ─── GIFT items — horizontal flex cards ─── */
@@ -2284,12 +2288,12 @@ body.is-dragging * {
 /* Row styling inside wrapper */
 #downloaded_pdf_clint_movements_data_page .clint_movements_row_class {
     background: white !important;
-    border-bottom: 1px solid rgba(201,168,76,0.3) !important;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.3) !important;
     min-height: clamp(42px, 8vw, 65px) !important;
 }
 
 #downloaded_pdf_clint_movements_data_page .clint_movements_row_class div {
-    border-left: 1px solid rgba(201,168,76,0.3) !important;
+    border-left: 1px solid rgba(201, 168, 76, 0.3) !important;
     padding: 6px 8px !important;
 }
 
@@ -2339,7 +2343,7 @@ body.is-dragging * {
     align-items: center;
     gap: 8px;
     background: white;
-    border: 1px solid rgba(201,168,76,0.4);
+    border: 1px solid rgba(201, 168, 76, 0.4);
     border-radius: 10px;
     padding: 12px 10px;
     direction: rtl;
@@ -2350,7 +2354,7 @@ body.is-dragging * {
     flex-shrink: 0;
     width: clamp(28px, 5.5vw, 46px);
     height: clamp(28px, 5.5vw, 46px);
-    background: rgba(201,168,76,0.12);
+    background: rgba(201, 168, 76, 0.12);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2391,7 +2395,9 @@ body.is-dragging * {
     direction: rtl;
 }
 
-#pdf_notes_page_title_text_div { flex: 1; }
+#pdf_notes_page_title_text_div {
+    flex: 1;
+}
 
 #pdf_notes_page_main_title_h1 {
     font-size: clamp(20px, 4.8vw, 42px) !important;
@@ -2452,7 +2458,7 @@ body.is-dragging * {
 
 #downloaded_pdf_important_notes_data_page .Important_notes_for_each_pdf_section_div_class h6 {
     background: white !important;
-    border: 1px solid rgba(201,168,76,0.35) !important;
+    border: 1px solid rgba(201, 168, 76, 0.35) !important;
     border-right: 3px solid #C9A84C !important;
     border-radius: 10px !important;
     padding: 10px 12px 10px 10px !important;
@@ -2476,8 +2482,8 @@ body.is-dragging * {
 
 #downloaded_pdf_important_notes_data_page .Important_notes_for_each_pdf_section_div_class h6:last-child {
     grid-column: 1 / -1 !important;
-    background: rgba(28,61,46,0.06) !important;
-    border: 1.5px solid rgba(28,61,46,0.22) !important;
+    background: rgba(28, 61, 46, 0.06) !important;
+    border: 1.5px solid rgba(28, 61, 46, 0.22) !important;
     border-right: 3px solid #1C3D2E !important;
     justify-content: center !important;
     font-weight: 700 !important;
@@ -2491,23 +2497,23 @@ body.is-dragging * {
 
 #downloaded_pdf_important_notes_data_page .thank_you_card {
     background: linear-gradient(160deg, #FAF7F0 0%, white 100%) !important;
-    border: 1.5px solid rgba(201,168,76,0.4) !important;
-    box-shadow: 0 4px 20px rgba(28,61,46,0.1) !important;
+    border: 1.5px solid rgba(201, 168, 76, 0.4) !important;
+    box-shadow: 0 4px 20px rgba(28, 61, 46, 0.1) !important;
 }
 
 #downloaded_pdf_important_notes_data_page .thank_you_card::before,
 #downloaded_pdf_important_notes_data_page .thank_you_card::after {
     background:
-        radial-gradient(circle, rgba(201,168,76,0.35) 0%, rgba(201,168,76,0.35) 24%, transparent 25%) 50% 50% / 100% 100% no-repeat,
-        radial-gradient(circle, rgba(201,168,76,0.18) 0%, rgba(201,168,76,0.18) 18%, transparent 19%) 50% 50% / 75% 75% no-repeat,
-        radial-gradient(circle, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.1) 14%, transparent 15%) 50% 50% / 55% 55% no-repeat !important;
+        radial-gradient(circle, rgba(201, 168, 76, 0.35) 0%, rgba(201, 168, 76, 0.35) 24%, transparent 25%) 50% 50% / 100% 100% no-repeat,
+        radial-gradient(circle, rgba(201, 168, 76, 0.18) 0%, rgba(201, 168, 76, 0.18) 18%, transparent 19%) 50% 50% / 75% 75% no-repeat,
+        radial-gradient(circle, rgba(201, 168, 76, 0.1) 0%, rgba(201, 168, 76, 0.1) 14%, transparent 15%) 50% 50% / 55% 55% no-repeat !important;
 }
 
 #downloaded_pdf_important_notes_data_page .thank_you_header_glow {
     background: linear-gradient(to bottom,
-        rgba(28,61,46,0.65) 0%,
-        rgba(28,61,46,0.2) 50%,
-        rgba(255,255,255,0) 100%) !important;
+            rgba(28, 61, 46, 0.65) 0%,
+            rgba(28, 61, 46, 0.2) 50%,
+            rgba(255, 255, 255, 0) 100%) !important;
 }
 
 #downloaded_pdf_important_notes_data_page .thank_you_title {
@@ -2515,8 +2521,8 @@ body.is-dragging * {
 }
 
 #downloaded_pdf_important_notes_data_page .thank_you_text {
-    border-color: rgba(201,168,76,0.25) !important;
-    background: rgba(201,168,76,0.04) !important;
+    border-color: rgba(201, 168, 76, 0.25) !important;
+    background: rgba(201, 168, 76, 0.04) !important;
 }
 
 #downloaded_pdf_important_notes_data_page #company_by_value_p_id {
@@ -2526,7 +2532,7 @@ body.is-dragging * {
     font-size: clamp(9px, 1.5vw, 15px) !important;
     color: #1C3D2E !important;
     font-weight: 700 !important;
-    border: 1px solid rgba(201,168,76,0.4) !important;
+    border: 1px solid rgba(201, 168, 76, 0.4) !important;
     border-radius: 30px !important;
     padding: 4px 20px !important;
     width: fit-content !important;
@@ -2555,7 +2561,9 @@ body.is-dragging * {
     direction: rtl;
 }
 
-#pdf_price_page_title_text_div { flex: 1; }
+#pdf_price_page_title_text_div {
+    flex: 1;
+}
 
 #pdf_price_page_main_title_h1 {
     font-size: clamp(20px, 4.8vw, 42px) !important;
@@ -2612,7 +2620,7 @@ body.is-dragging * {
     border: 1.5px solid #C9A84C;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 6px 28px rgba(201,168,76,0.2);
+    box-shadow: 0 6px 28px rgba(201, 168, 76, 0.2);
 }
 
 #pdf_price_reveal_top_band_div {
@@ -2653,7 +2661,7 @@ body.is-dragging * {
     font-weight: 600 !important;
     padding: 0 0 6px !important;
     border-radius: 0 !important;
-    border-bottom: 1.5px solid rgba(201,168,76,0.3) !important;
+    border-bottom: 1.5px solid rgba(201, 168, 76, 0.3) !important;
     text-align: center !important;
 }
 
@@ -2664,7 +2672,7 @@ body.is-dragging * {
     direction: rtl !important;
     margin: 0 !important;
     padding: 10px 24px 16px !important;
-    border-top: 1px solid rgba(201,168,76,0.2) !important;
+    border-top: 1px solid rgba(201, 168, 76, 0.2) !important;
 }
 
 #pdf_price_ornament_row_div {

@@ -4,8 +4,8 @@
     {
       "name": "luxpath",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5500"],
-      "port": 5500
+      "runtimeArgs": ["-m", "http.server", "5599"],
+      "port": 5599
     }
   ]
 }
