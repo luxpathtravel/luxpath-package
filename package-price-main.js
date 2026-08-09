@@ -3,6 +3,9 @@
    Auto-builds on hotel add/remove/date/price changes.
    ═══════════════════════════════════════════════════ */
 
+// Shown in the domestic-flight input while the flight PDF page is hidden
+const PPT_NO_FLIGHT_TEXT = 'لايوجد خطوط طيران';
+
 // ─── Auto-trigger setup ───────────────────────────────
 (function _initPptAutoTrigger() {
     let _timer = null;
@@ -12,6 +15,15 @@
         _timer = setTimeout(() => {
             buildPriceTable();
         }, 600);
+    }
+
+    let _flightTimer = null;
+
+    function _scheduleFlightSync() {
+        clearTimeout(_flightTimer);
+        _flightTimer = setTimeout(() => {
+            pptSyncInnerFlightSection();
+        }, 150);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -24,6 +36,26 @@
                 attributeFilter: ['data-safe-side-price', 'data-safe-side-price2']
             });
         }
+
+        // The "طيران داخلي" row mirrors the flight PDF page. Watch the page's visibility
+        // (every show/hide path flips its inline style.display) and the flight rows
+        // themselves, since the ticket price is per one-way leg.
+        const flightPage = document.getElementById('downloaded_pdf_flight_data_page');
+        if (flightPage) {
+            new MutationObserver(_scheduleFlightSync).observe(flightPage, {
+                attributes: true,
+                attributeFilter: ['style']
+            });
+        }
+
+        const flightContainer = document.getElementById('inserted_flight_data_position_div');
+        if (flightContainer) {
+            new MutationObserver(_scheduleFlightSync).observe(flightContainer, { childList: true });
+        }
+
+        // The flight page starts hidden, so the input starts as "لايوجد خطوط طيران"
+        pptSyncInnerFlightSection();
+
         // Note: client/passenger data no longer auto-rebuilds the table.
         // SIM + domestic-flight prices refresh only via pptRefreshFromClintData()
         // (called by createWholePackageAndClintDataFunction).
@@ -139,12 +171,16 @@ async function buildPriceTable() {
     }
 
     // 4. Inner flights — auto-fill the editable domestic-flight input from passenger counts
-    //    (adults + children = full ticket, each infant = 50%). Only overwrites when the
-    //    passenger/ticket-price signature changes, so manual edits survive hotel-only rebuilds.
+    //    (adults + children = full ticket, each infant = 50%) × the number of one-way legs.
+    //    Only overwrites when the passenger/ticket-price/legs signature changes, so manual
+    //    edits survive hotel-only rebuilds. The row itself only exists while the flight PDF
+    //    page is visible.
     _pptAutoFillDomesticFlight(adultsCount, childrenCount, infantsCount, domesticTicketPrice);
-    const _domFlightRaw = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
-    const _domFlightPrice = parseInt(_domFlightRaw) || 0;
-    rows.push({ type: 'inner_flight', label: 'طيران داخلي', price: _domFlightPrice > 0 ? _domFlightPrice : null, deletable: false });
+    if (_pptFlightSectionVisible()) {
+        const _domFlightRaw = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
+        const _domFlightPrice = parseInt(_domFlightRaw) || 0;
+        rows.push({ type: 'inner_flight', label: 'طيران داخلي', price: _domFlightPrice > 0 ? _domFlightPrice : null, deletable: false });
+    }
 
     _renderPriceTable(tableDiv, rows);
     tableDiv.dataset.built = 'true';
@@ -558,6 +594,10 @@ function _pptPerformDelete(tr) {
 
 // ─── Recalculate total ────────────────────────────────
 function _recalcPriceTotal() {
+    // Nothing to total while the table is missing / mid-rebuild — bail before the profit
+    // field gets read as 0 and wipes the persisted value.
+    if (!document.getElementById('ppt_tbody')) return;
+
     let total = 0;
     document.querySelectorAll('#ppt_tbody .ppt_price_value').forEach(el => {
         total += parseInt(el.dataset.raw) || 0;
@@ -637,32 +677,111 @@ function _pptParsePassengers(txt) {
     return { adults, children, infants };
 }
 
-// Auto-fill the domestic-flight input: (adults + children) full ticket, each infant 50%.
-// Skips when the passenger/price signature is unchanged so manual edits aren't clobbered.
+// ─── Flight page state ────────────────────────────────
+// The flight PDF page is toggled by inline style.display everywhere in the app.
+function _pptFlightSectionVisible() {
+    const section = document.getElementById('downloaded_pdf_flight_data_page');
+    return !!section && section.style.display !== 'none';
+}
+
+// Each flight row is a single one-way leg (from city → to city).
+function _pptFlightLegsCount() {
+    return document.querySelectorAll(
+        '#inserted_flight_data_position_div .flight_row_class_for_editing'
+    ).length;
+}
+
+// Auto-fill the domestic-flight input: the stored ticket price is per person, one way —
+// (adults + children) full ticket, each infant 50%, multiplied by the number of legs.
+// Shows PPT_NO_FLIGHT_TEXT instead while the flight page is hidden.
+// Skips when the passenger/price/legs/visibility signature is unchanged so manual edits
+// aren't clobbered.
 function _pptAutoFillDomesticFlight(adults, children, infants, ticketPrice) {
     const input = document.getElementById('domestic_flight_price_input_id');
     if (!input) return;
 
-    const signature = `${adults}|${children}|${infants}|${ticketPrice}`;
+    const visible = _pptFlightSectionVisible();
+    // A visible-but-empty page still prices one leg
+    const legs = visible ? Math.max(_pptFlightLegsCount(), 1) : 0;
+
+    const signature = `${adults}|${children}|${infants}|${ticketPrice}|${legs}|${visible}`;
     if (window._pptLastFlightSig === signature) return;
     window._pptLastFlightSig = signature;
 
-    const autoTotal = ticketPrice > 0
+    if (!visible) {
+        input.value = PPT_NO_FLIGHT_TEXT;
+        input.readOnly = true;
+        return;
+    }
+
+    input.readOnly = false;
+
+    const perLeg = ticketPrice > 0
         ? Math.round((adults + children) * ticketPrice + infants * ticketPrice * 0.5)
         : 0;
+    const autoTotal = perLeg * legs;
     input.value = autoTotal > 0 ? Number(autoTotal).toLocaleString('en-US') : '';
 }
 
-// ─── Domestic flight price sync ───────────────────────
-function updateDomesticFlightPrice() {
-    const raw = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
-    const numVal = parseInt(raw) || 0;
+// ─── Inner-flight row presence ────────────────────────
+function _pptEnsureInnerFlightRow() {
+    const tbody = document.getElementById('ppt_tbody');
+    if (!tbody) return null;
 
+    const existing = tbody.querySelector('tr[data-type="inner_flight"]');
+    if (existing) return existing;
+
+    const html = _buildRowHtml(
+        { type: 'inner_flight', label: 'طيران داخلي', price: null, deletable: false },
+        tbody.querySelectorAll('tr').length
+    );
+
+    // Keep it where buildPriceTable puts it: after the auto rows, before the
+    // user-added custom / international-flight rows.
+    const anchor = [...tbody.querySelectorAll('tr')].find(
+        tr => tr.dataset.type === 'custom' || tr.dataset.type === 'outer_flight'
+    );
+    if (anchor) anchor.insertAdjacentHTML('beforebegin', html);
+    else tbody.insertAdjacentHTML('beforeend', html);
+
+    return tbody.querySelector('tr[data-type="inner_flight"]');
+}
+
+function _pptRemoveInnerFlightRow() {
     const row = document.querySelector('#ppt_tbody tr[data-type="inner_flight"]');
+    if (row) row.remove();
+}
+
+// Re-runs the domestic-flight input + row whenever the flight page is shown/hidden or its
+// legs change. Wired to the MutationObservers above and called by hideAndShowFlightSectionFunction.
+function pptSyncInnerFlightSection() {
+    const passengersText = document.querySelector('#inserted_clint_data_position_div .clint_data_row_class_for_editing div:first-child p')?.innerText || '';
+    const { adults, children, infants } = _pptParsePassengers(passengersText);
+
+    _pptAutoFillDomesticFlight(adults, children, infants, window._pptSettings?.domesticTicketPrice || 0);
+
+    if (!document.getElementById('ppt_tbody')) return; // price table not built yet
+    updateDomesticFlightPrice();
+}
+
+// ─── Domestic flight price sync ───────────────────────
+// Mirrors the domestic-flight input into the "طيران داخلي" row. That row only belongs in the
+// table while the flight PDF page is visible, so this creates/removes it to match.
+function updateDomesticFlightPrice() {
+    if (!_pptFlightSectionVisible()) {
+        _pptRemoveInnerFlightRow();
+        _recalcPriceTotal();
+        return;
+    }
+
+    const row = _pptEnsureInnerFlightRow();
     if (!row) return;
 
     const span = row.querySelector('.ppt_price_value');
     if (!span) return;
+
+    const raw = document.getElementById('domestic_flight_price_input_id')?.value?.replace(/,/g, '') || '';
+    const numVal = parseInt(raw) || 0;
 
     span.dataset.raw = numVal;
     span.className = numVal > 0 ? 'ppt_price_value' : 'ppt_price_value ppt_no_price';

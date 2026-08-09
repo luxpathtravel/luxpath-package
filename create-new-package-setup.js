@@ -3058,6 +3058,8 @@ hideAndShowFlightSectionFunction = function () {
         document.getElementById('manually_add_flight_row_icon').style.display = 'block';
     }
 
+    /* Add / remove the 'طيران داخلي' row in the price table to match the new visibility */
+    if (typeof pptSyncInnerFlightSection === 'function') pptSyncInnerFlightSection();
 }
 
 
