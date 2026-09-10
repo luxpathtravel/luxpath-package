@@ -6721,6 +6721,44 @@ downloadPdfWithCurrentUserCodeName = function () {
 downloadPdfWithCustomName = async function (pdfName) {
     let { jsPDF } = window.jspdf;
 
+    /* ─── PDF output quality ───────────────────────────────────────────────
+       Capture resolution is expressed as a print DPI target instead of a flat
+       html2canvas scale, so the finished PDF no longer depends on how wide the
+       browser window happens to be (A4 width 210mm = 8.268in). The old flat 3.3
+       gave ~250 DPI on a narrow window and ~560 DPI on a wide one.
+       Raise PDF_TARGET_DPI for sharper pages at the cost of a larger file. */
+    const PDF_TARGET_DPI = 450;              // desktop
+    const PDF_TARGET_DPI_MOBILE = 300;       // phones have a much smaller canvas budget
+    const PDF_MIN_SCALE = 4;                 // never render below this (was a flat 3.3)
+    const PDF_MAX_SCALE = 8;
+    const PDF_JPEG_QUALITY = 0.95;           // was 0.9
+    const PDF_MAX_CANVAS_DIM = 16384;        // per-axis browser canvas cap
+    const PDF_MAX_CANVAS_AREA = 120e6;       // desktop total-pixel cap
+    const PDF_MAX_CANVAS_AREA_MOBILE = 25e6;
+
+    let _isMobilePdf = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+
+    /* Work out the html2canvas scale for one section: aim for the DPI target across
+       the A4 width, keep the old scale as a floor, then pull back if the result
+       would exceed what the browser can allocate as a canvas. */
+    let pdfScaleForSection = function (section) {
+        let w = section.offsetWidth || section.getBoundingClientRect().width;
+        let h = section.offsetHeight || section.getBoundingClientRect().height;
+        if (!w || !h) return PDF_MIN_SCALE;
+
+        let targetPx = (210 / 25.4) * (_isMobilePdf ? PDF_TARGET_DPI_MOBILE : PDF_TARGET_DPI);
+        let maxArea = _isMobilePdf ? PDF_MAX_CANVAS_AREA_MOBILE : PDF_MAX_CANVAS_AREA;
+
+        let hardCap = Math.min(
+            PDF_MAX_CANVAS_DIM / w,
+            PDF_MAX_CANVAS_DIM / h,
+            Math.sqrt(maxArea / (w * h))
+        );
+
+        let wanted = Math.min(Math.max(targetPx / w, PDF_MIN_SCALE), PDF_MAX_SCALE);
+        return Math.min(wanted, hardCap);
+    };
+
     // Function to capture a canvas of a given section
     let captureCanvas = async function (section, scale) {
         var _saved = [];
@@ -6734,6 +6772,10 @@ downloadPdfWithCustomName = async function (pdfName) {
             // draw each element ourselves with ctx.direction='rtl', swap it to an
             // <img>, let html2canvas capture the image, then restore the originals.
             var _re = /[؀-ۿ]/;
+            // Rasterise the Arabic titles at the resolution html2canvas will capture
+            // at — a fixed 2x here left every title upscaled (and soft) in the PDF.
+            var _rasterScale = Math.max(2, scale);
+            var _decodes = [];
             section.querySelectorAll(
                 '#pdf_page1_welcome_title_p, #clint_package_type_h6, .pdf_section_title_div_class h6'
             ).forEach(function (el) {
@@ -6753,9 +6795,11 @@ downloadPdfWithCustomName = async function (pdfName) {
                 var w = Math.max(1, totalW - padH - borH);
                 var h = Math.max(1, totalH - padV - borV);
                 var tmpC = document.createElement('canvas');
-                tmpC.width = w * 2; tmpC.height = h * 2;
+                tmpC.width = Math.ceil(w * _rasterScale); tmpC.height = Math.ceil(h * _rasterScale);
                 var ctx = tmpC.getContext('2d');
-                ctx.scale(2, 2);
+                ctx.scale(_rasterScale, _rasterScale);
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.direction = 'rtl';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -6765,10 +6809,24 @@ downloadPdfWithCustomName = async function (pdfName) {
                 var img = document.createElement('img');
                 img.src = tmpC.toDataURL('image/png');
                 img.style.cssText = 'width:' + w + 'px;height:' + h + 'px;display:block;';
+                // img.decode() can stay pending forever on a detached element, so wait on
+                // the load event instead — with a timeout so a stubborn image can never
+                // block the download.
+                if (!img.complete) {
+                    _decodes.push(new Promise(function (resolve) {
+                        var done = function () { resolve(); };
+                        img.onload = done;
+                        img.onerror = done;
+                        setTimeout(done, 3000);
+                    }));
+                }
                 _saved.push({ el: el, html: el.innerHTML });
                 el.innerHTML = '';
                 el.appendChild(img);
             });
+
+            // These data URLs are far bigger now — make sure they are loaded before capture
+            await Promise.all(_decodes);
 
             let canvas = await html2canvas(section, {
                 scale: scale,
@@ -7366,7 +7424,6 @@ downloadPdfWithCustomName = async function (pdfName) {
         return;
     }
 
-    let scale = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 3.3 : 3.3;
     let pdf = null;
     let pdfWidth = 210;
 
@@ -7409,7 +7466,7 @@ downloadPdfWithCustomName = async function (pdfName) {
     for (let i = 0; i < regularSections.length; i++) {
         let section = regularSections[i];
 
-        let canvas = await captureCanvas(section, scale);
+        let canvas = await captureCanvas(section, pdfScaleForSection(section));
         if (!canvas) { continue; }
 
         let pdfHeight = (canvas.height * pdfWidth) / canvas.width;
@@ -7418,7 +7475,7 @@ downloadPdfWithCustomName = async function (pdfName) {
         } else {
             pdf.addPage([pdfWidth, pdfHeight]);
         }
-        let imgData = canvas.toDataURL('image/jpeg', 0.9);
+        let imgData = canvas.toDataURL('image/jpeg', PDF_JPEG_QUALITY);
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
 
         // Add clickable link annotations for hotel row URL cells
@@ -7436,7 +7493,7 @@ downloadPdfWithCustomName = async function (pdfName) {
 
     // Add Clint Movements as a separate page (if visible)
     if (clintMovementsSection) {
-        let movementsCanvas = await captureCanvas(clintMovementsSection, scale);
+        let movementsCanvas = await captureCanvas(clintMovementsSection, pdfScaleForSection(clintMovementsSection));
         if (movementsCanvas) {
             movementsCanvas = adjustClintMovementsCanvas(movementsCanvas);
             let pdfHeight = (movementsCanvas.height * pdfWidth) / movementsCanvas.width;
@@ -7445,14 +7502,14 @@ downloadPdfWithCustomName = async function (pdfName) {
             } else {
                 pdf.addPage([pdfWidth, pdfHeight]);
             }
-            let imgData = movementsCanvas.toDataURL('image/jpeg', 0.9);
+            let imgData = movementsCanvas.toDataURL('image/jpeg', PDF_JPEG_QUALITY);
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
         }
     }
 
     // Add Total Price as a separate page AFTER clint movements (if visible)
     if (totalPriceSection) {
-        let totalPriceCanvas = await captureCanvas(totalPriceSection, scale);
+        let totalPriceCanvas = await captureCanvas(totalPriceSection, pdfScaleForSection(totalPriceSection));
         if (totalPriceCanvas) {
             let pdfHeight = (totalPriceCanvas.height * pdfWidth) / totalPriceCanvas.width;
             if (!pdf) {
@@ -7460,14 +7517,14 @@ downloadPdfWithCustomName = async function (pdfName) {
             } else {
                 pdf.addPage([pdfWidth, pdfHeight]);
             }
-            let imgData = totalPriceCanvas.toDataURL('image/jpeg', 0.9);
+            let imgData = totalPriceCanvas.toDataURL('image/jpeg', PDF_JPEG_QUALITY);
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
         }
     }
 
     // Add Important Notes as the final separate page (if visible)
     if (importantNotesSection) {
-        let notesCanvas = await captureCanvas(importantNotesSection, scale);
+        let notesCanvas = await captureCanvas(importantNotesSection, pdfScaleForSection(importantNotesSection));
         if (notesCanvas) {
             let pdfHeight = (notesCanvas.height * pdfWidth) / notesCanvas.width;
             if (!pdf) {
@@ -7475,7 +7532,7 @@ downloadPdfWithCustomName = async function (pdfName) {
             } else {
                 pdf.addPage([pdfWidth, pdfHeight]);
             }
-            let imgData = notesCanvas.toDataURL('image/jpeg', 0.9);
+            let imgData = notesCanvas.toDataURL('image/jpeg', PDF_JPEG_QUALITY);
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
         }
     }
