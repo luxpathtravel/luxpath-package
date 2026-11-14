@@ -3743,9 +3743,6 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
         // Get the clicked hotel data row
         let clickedHotelDataDiv = document.getElementById(clickedHotelRowIdName);
 
-        // Clear the old data
-        clickedHotelDataDiv.innerHTML = '';
-
         // Extract the new data from the input fields
         let hotelNameReadyText = document.getElementById('hotel_name_input_id').value;
         let hotelLocationInput = document.getElementById('hotel_location_input_id').value;
@@ -3853,6 +3850,10 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
         playSoundEffect('success');
 
 
+        // Clear the old data only now that all the checks above passed, so a failed confirm keeps the row as it was
+        clickedHotelDataDiv.innerHTML = '';
+
+
 
         /* Check the insert hotel data system is by picking or writing by checking the visibilaty of the 'hotel_location_input_id' input */
         if (document.getElementById('hotel_location_input_id').style.display !== 'none') {
@@ -3907,6 +3908,14 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
             clickedHotelDataDiv.innerHTML = hotelRowTableDivContent;
             if (hotelSafeSidePrice) clickedHotelDataDiv.dataset.safeSidePrice = hotelSafeSidePrice;
             if (hotelSafeSidePrice_2 && document.getElementById('hotel_second_room_data_input_div').style.display !== 'none') clickedHotelDataDiv.dataset.safeSidePrice2 = hotelSafeSidePrice_2;
+
+
+            // Override data-url with manually entered Booking.com URL if provided
+            const _manualBookingUrl = document.getElementById('hotel_booking_url_input_id').value.trim();
+            if (_manualBookingUrl) {
+                const _urlCell = clickedHotelDataDiv.querySelector('.hotel-row-url-cell');
+                if (_urlCell) _urlCell.dataset.url = _manualBookingUrl;
+            }
 
 
             // Append <span> elements for each input with text
