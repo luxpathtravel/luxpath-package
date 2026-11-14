@@ -2941,7 +2941,7 @@ createHotelsDataFunction = function () {
             let usedDays; // Declare usedDays to be assigned later
 
             if (cityName === "بالي" && areaName) {
-                if (areaName === "اوبود" || areaName === "كيراماس") {
+                if (areaName === "اوبود" || areaName === "كيراماس" || areaName === "براتان") {
                     targetObject = allClintVisitingPlacesArray[1][packageKey];
                     usedDays = usedVisitingPlaces.baliUbudKeramas;
                 } else if (["كوتا", "نوسا دوا", "سيمنياك", "جيمباران", "اولواتو", "ليجين", "سانور", "تابانان", "تشانغو", "Tampaksiring"].includes(areaName)) {
@@ -4573,7 +4573,7 @@ editClickedHotelDataFunction = function (clickedHotelRowIdName) {
                 let usedDays; // Declare usedDays to be assigned later
 
                 if (cityName === "بالي" && areaName) {
-                    if (areaName === "اوبود" || areaName === "كيراماس") {
+                    if (areaName === "اوبود" || areaName === "كيراماس" || areaName === "براتان") {
                         targetObject = allClintVisitingPlacesArray[1][packageKey];
                         usedDays = usedVisitingPlaces.baliUbudKeramas;
                     } else if (["كوتا", "نوسا دوا", "سيمنياك", "جيمباران", "اولواتو", "ليجين", "سانور", "بيانجان", "تشانغو", "Tampaksiring"].includes(areaName)) {
@@ -5304,7 +5304,7 @@ autoCreateALlClintMovementsData = function (preservePageVisibility) {
             let usedDays; // Declare usedDays to be assigned later
 
             if (cityName === "بالي" && areaName) {
-                if (areaName === "اوبود" || areaName === "كيراماس") {
+                if (areaName === "اوبود" || areaName === "كيراماس" || areaName === "براتان") {
                     targetObject = allClintVisitingPlacesArray[1][packageKey];
                     usedDays = usedVisitingPlaces.baliUbudKeramas;
                 } else if (["كوتا", "نوسا دوا", "سيمنياك", "جيمباران", "اولواتو", "ليجين", "سانور", "بيانجان", "تشانغو", "Tampaksiring"].includes(areaName)) {
